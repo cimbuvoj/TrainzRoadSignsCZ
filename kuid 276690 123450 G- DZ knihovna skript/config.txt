@@ -1,0 +1,26 @@
+﻿
+kuid                                    <kuid:276690:123450>
+description                             "G- DZ knihovna skriptu"
+category-class                          "HM"
+username                                "G- DZ knihovna skriptu"
+author                                  "Glocky, Wilks"
+contact-email                           "Mr.Glocky@seznam.cz"
+kind                                    "library"
+trainz-build                            4.5
+script                                  "dz_lib.gs"
+class                                   "dzlib"
+
+thumbnails
+{
+  0
+  {
+    width                               240
+    height                              180
+    image                               "image.jpg"
+  }
+}
+
+kuid-table
+{
+  dzlib                                 <kuid:276690:123450>
+}

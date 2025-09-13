@@ -1,0 +1,2 @@
+Primary=texSSSR.bmp
+Tile=st
