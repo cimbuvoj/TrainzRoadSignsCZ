@@ -1,0 +1,348 @@
+﻿
+kuid                                    <kuid:276690:500162>
+description                             "G- DZ vystrazne"
+category-class                          "BR"
+username                                "G- DZ vystrazne"
+author                                  "Glocky, Wilks"
+contact-email                           "Mr.Glocky@seznam.cz"
+kind                                    "scenery"
+trainz-build                            4.5
+rotate-yz-range                         -5,5
+script                                  "dummy.gs"
+class                                   "Dummy"
+
+script-include-table
+{
+  dz_lib_scripts                        <kuid:276690:400047>
+}
+
+mesh-table
+{
+  default
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "DZ_default.trainzmesh"
+    position                            0,0,0
+    auto-create                         1
+  }
+  
+  zaklad
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "zaklad.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  sloup01
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "tyc-1000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  sloup02
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "tyc-2000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  sloup03
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "tyc-3000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  sloup04
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "tyc-2300.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  svorka01
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "svorka-1000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  svorka02
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "svorka-2000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  svorka03
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "svorka-3000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  svorka04
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "svorka-2300.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka01
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a01a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka02
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a01b.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka03
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a02a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka04
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a02b.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka05
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a03.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka06
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a04.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka07
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a05a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka08
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a05b.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka09
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a06a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka10
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a06b.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka11
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a07a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka12
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a10.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka13
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a11.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka14
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a11-ref.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka15
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a12a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka16
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a12a-ref.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka17
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a12b.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka18
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a12b-ref.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka19
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a14.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka20
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a15.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka21
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a15-ref.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka22
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a21.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka23
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a22.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka24
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a25.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka25
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a29.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka26
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a30.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka27
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a31a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka28
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a31b.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka29
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "a31c.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+}
+
+thumbnails
+{
+  0
+  {
+    width                               240
+    height                              180
+    image                               "image.jpg"
+  }
+}
+
+kuid-table
+{
+  databaze-scriptu                      <kuid:276690:400047>
+  databaze                              <kuid:276690:400067>
+}

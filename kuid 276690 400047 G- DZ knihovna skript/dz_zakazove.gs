@@ -19,11 +19,11 @@ class DZZakazove isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("B 8 Zákaz vjezdu jízdních kol", 						"img/b8.png");
 		SignEntries[EmplaceEntry()].SetData("B 11 Zákaz vjezdu všech motorových vozidel", 			"img/b11.png");
 		SignEntries[EmplaceEntry()].SetData("B 11 Zákaz vjezdu všech motorových vozidel", 			"img/b11z.png");
-		SignEntries[EmplaceEntry()].SetData("B 13 Zákaz vjezdu vozidel, jejichž okamžitá hmotnost přesahuje vyznačenou mez", "img/b13.png", RoadSignUtils.INPUT_Float, 6);
-		SignEntries[EmplaceEntry()].SetData("B 15 Zákaz vjezdu vozidel, jejichž šířka přesahuje vyznačenou mez", "img/b15.png", RoadSignUtils.INPUT_Float, 2.5);
-		SignEntries[EmplaceEntry()].SetData("B 16 Zákaz vjezdu vozidel, jejichž výška přesahuje vyznačenou mez", "img/b16.png", RoadSignUtils.INPUT_Float, 3.5);
-		SignEntries[EmplaceEntry()].SetData("B 20a Nejvyšší dovolená rychlost", 		"img/b20a.png", RoadSignUtils.INPUT_Int, 80);
-		SignEntries[EmplaceEntry()].SetData("B 20b Konec nejvyšší dovolené rychlosti", 	"img/b20b.png", RoadSignUtils.INPUT_Int, 80);
+		SignEntries[EmplaceEntry()].SetData("B 13 Zákaz vjezdu vozidel, jejichž okamžitá hmotnost přesahuje vyznačenou mez", "img/b13.png", RSUtils.INPUT_Float, 6);
+		SignEntries[EmplaceEntry()].SetData("B 15 Zákaz vjezdu vozidel, jejichž šířka přesahuje vyznačenou mez", "img/b15.png", RSUtils.INPUT_Float, 2.5);
+		SignEntries[EmplaceEntry()].SetData("B 16 Zákaz vjezdu vozidel, jejichž výška přesahuje vyznačenou mez", "img/b16.png", RSUtils.INPUT_Float, 3.5);
+		SignEntries[EmplaceEntry()].SetData("B 20a Nejvyšší dovolená rychlost", 		"img/b20a.png", RSUtils.INPUT_Int, 80);
+		SignEntries[EmplaceEntry()].SetData("B 20b Konec nejvyšší dovolené rychlosti", 	"img/b20b.png", RSUtils.INPUT_Int, 80);
 		SignEntries[EmplaceEntry()].SetData("B 21a Zákaz předjíždění", 					"img/b21a.png");
 		SignEntries[EmplaceEntry()].SetData("B 21b Konec zákazu předjíždění", 			"img/b21b.png");
 		SignEntries[EmplaceEntry()].SetData("B 22a Zákaz předjíždění pro nákladní automobily", 			"img/b22a.png");
