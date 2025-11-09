@@ -4,211 +4,8 @@
 // =================================
 
 include "MapObject.gs"
+include "dz_lib.gs"
 
-// Road Sign Utils
-static final class RSUtils
-{
-	define public int TAG_SignSelection 	 = 100;
-	define public int TAG_SignPole 		 	 = 101;
-	define public int TAG_InputEntry 		 = 102;
-	define public int TAG_SignAdditionalData = 103;
-	define public int TAG_SignBase			 = 104;
-
-	define public string CFG_Base = "zaklad";
-	define public string CFG_Pole = "sloup";
-	define public string CFG_Clip = "svorka";
-	define public string CFG_Sign = "znacka";
-
-	define public int INPUT_None 	= 0;
-	define public int INPUT_Int		= 1;
-	define public int INPUT_Float 	= 2;
-	define public int INPUT_Sign	= 3;
-
-	define public int Pole_None 	= 1 << 0;
-	define public int Pole_100cm 	= 1 << 1;
-	define public int Pole_200cm 	= 1 << 2;
-	define public int Pole_300cm 	= 1 << 3;
-	define public int Pole_230cm 	= 1 << 4;
-
-	define public int BaseEnable_Bit 	= 1 << 15;
-
-	define public int Default_PoleValuesAll = Pole_None | Pole_100cm | Pole_200cm | Pole_300cm| Pole_230cm;
-	define public int Default_Customization = Pole_300cm | BaseEnable_Bit;
-
-	// ======================
-	// Functions
-	// ======================
-	public float floor(float InValue)
-	{
-		int Tmp = (int) InValue;
-		return (float) Tmp;
-	}
-
-	public string FormatFloatInput(float Value)
-	{
-		string FormattedString = (string) Value;
-
-		if (Value == floor(Value))
-		{
-			// Input value does not have a decimal point, format as 'x' (single digit)
-			Str.Left(FormattedString, 1);
-		}
-		else
-		{
-			// Float number - cut to just three characters, so the format will be 'x.y'
-			Str.Left(FormattedString, 3);
-		}
-		
-		return FormattedString;
-	}
-
-	public string FormatIntInput(int Value)
-	{
-		// Clamp into allowed range
-		Value = Math.Max(Value, 0);
-		Value = Math.Min(Value, 150);
-		
-		return (string) Value;
-	}
-
-	public int GetSignPoleFlagFromHtmlText(string PoleHtmlText)
-	{
-		int SignPoleFlag = 0;
-		if (PoleHtmlText == "Žádný") SignPoleFlag = Pole_None;
-		else if (PoleHtmlText == "1 metr") SignPoleFlag = Pole_100cm;
-		else if (PoleHtmlText == "2 metry") SignPoleFlag = Pole_200cm;
-		else if (PoleHtmlText == "3 metry") SignPoleFlag = Pole_300cm;
-		else if (PoleHtmlText == "2.3 metru") SignPoleFlag = Pole_230cm;
-
-		return SignPoleFlag;
-	}
-
-	public string GetCurrentSignPoleHtmlText(int CustomizationFlags)
-	{
-		string PoleHtmlText = "ERROR";
-		switch(CustomizationFlags & RSUtils.Default_PoleValuesAll)
-		{
-			case RSUtils.Pole_None:
-				PoleHtmlText = "Žádný";
-				break;
-			case RSUtils.Pole_100cm:
-				PoleHtmlText = "1 metr";
-				break;
-			case RSUtils.Pole_200cm:
-				PoleHtmlText = "2 metry";
-				break;
-			case RSUtils.Pole_300cm:
-				PoleHtmlText = "3 metry";
-				break;
-			case RSUtils.Pole_230cm:
-				PoleHtmlText = "2.3 metry";
-				break;
-			default:
-				break;
-		}
-		return PoleHtmlText;
-	}
-
-	public string GetSignPoleOrClipConfigTag(string CfgTag, int CustomizationFlags)
-	{
-		switch(CustomizationFlags & Default_PoleValuesAll)
-		{
-			case RSUtils.Pole_100cm:
-				CfgTag = CfgTag +"01";
-				break;
-			case RSUtils.Pole_200cm:
-				CfgTag = CfgTag +"02";
-				break;
-			case RSUtils.Pole_300cm:
-				CfgTag = CfgTag +"03";
-				break;
-			case RSUtils.Pole_230cm:
-				CfgTag = CfgTag +"04";
-				break;
-			default:
-				CfgTag = null;
-				break;
-		}
-		return CfgTag;
-	}
-
-	public string GetSignConfigTag(int Index)
-	{
-		// Tags start from 01, but code starts from 0
-		// add 1 to get correct CFG tag
-		Index = Index + 1;
-
-		string CfgTag = CFG_Sign;
-		if (Index < 10)
-		{
-			// Config tags have form 'znackaXY', where 'X' can be 0
-			// so we need to add extra '0' in this case
-			CfgTag = CfgTag + "0";
-		}
-		return CfgTag + Index;
-	}
-
-	public float GetSignHeightFromPole(int CustomizationFlags)
-	{
-		float Height = 0.0;
-		switch(CustomizationFlags & RSUtils.Default_PoleValuesAll)
-		{
-			case RSUtils.Pole_None:
-				break;
-			case RSUtils.Pole_100cm:
-				Height = -2.0;
-				break;
-			case RSUtils.Pole_200cm:
-				Height = -1.0;
-				break;
-			case RSUtils.Pole_300cm:
-				Height = 0.0;
-				break;
-			case RSUtils.Pole_230cm:
-				Height = -0.7;
-				break;
-			default:
-				break;
-		}
-		return Height;
-	}
-
-	public string Img(int w, int h, string src)
-	{
-		return "<img width=" + w + " height=" + h + " src=\"" + src + "\"></img>";
-	}
-
-	public string RadioButton(string Property, bool Value)
-	{
-		return HTMLWindow.RadioButton("live://property/" + Property, Value);
-	}
-
-	public string Checkbox(int Property, bool Value)
-	{
-		return HTMLWindow.CheckBox("live://property/" + (string)Property, Value);
-	}
-
-	public string InputField(string Property, string Tooltip, string Text)
-	{
-		return "<td align=left valign=center><font size=2 face=Consolas color=#ffffff><a tooltip=\""+Tooltip+"\" href=live://property/"+Property+">"+Text+"</a></font></td>";
-	}
-
-	public string Td(string Text, string ImagePath, int SignSelectionIdx, int Idx)
-	{
-		string FontColor = "#ffffff";
-		
-		// Highlighted signs will get highlighted text
-		if (Str.Find(ImagePath, "z", ImagePath.size() - 5) > 0)
-		{
-			FontColor = "#F4E601";
-		}
-
-		return
-			"<td width=1% valign=center align=center>" + RadioButton(TAG_SignSelection + "/" + Idx, SignSelectionIdx == Idx) + "</td>"+
-			"<td width=1% valign=center align=center>" + Img(50, 50, ImagePath) + "</td>"+
-			"<td valign=center width=31%><font size=1 face=Consolas color=" + FontColor + ">" + Text + "</font></td>";
-	}
-};
 
 // Configuration of each sign type
 class SignData
@@ -216,7 +13,7 @@ class SignData
 	public string Name;
 	public string ImagePath;
 	public int InputType = RSUtils.INPUT_None;
-	public float AdditionalData = 0.0;
+	public float AdditionalData = 0.0f;
 	public bool bPole230cmOnly = false;
 
 	public void SetData(string InName, string InImagePath, int InInputType, float InAdditionalData, bool bInPole230cmOnly)
@@ -235,12 +32,12 @@ class SignData
 
 	public void SetData(string InName, string InImagePath, bool bInPole230cmOnly)
 	{
-		SetData(InName, InImagePath, RSUtils.INPUT_None, 0.0, bInPole230cmOnly);
+		SetData(InName, InImagePath, RSUtils.INPUT_None, 0.0f, bInPole230cmOnly);
 	}
 
 	public void SetData(string InName, string InImagePath)
 	{
-		SetData(InName, InImagePath, RSUtils.INPUT_None, 0.0, false);
+		SetData(InName, InImagePath, RSUtils.INPUT_None, 0.0f, false);
 	}
 };
 
@@ -281,28 +78,28 @@ class DZBase isclass MapObject
 	void ResetMeshes()
 	{
 		// Sign base
-		SetMeshVisible(RSUtils.CFG_Base, (bool) (Customization & RSUtils.BaseEnable_Bit), 0.0);
+		SetMeshVisible(RSUtils.CFG_Base, (bool) (Customization & RSUtils.BaseEnable_Bit), 0.0f);
 
 		// Sign pole + clip
-		SetMeshVisible(RSUtils.CFG_Pole + "01", false, 0.0);
-		SetMeshVisible(RSUtils.CFG_Pole + "02", false, 0.0);
-		SetMeshVisible(RSUtils.CFG_Pole + "03", false, 0.0);
-		SetMeshVisible(RSUtils.CFG_Pole + "04", false, 0.0);
-		SetMeshVisible(RSUtils.CFG_Clip + "01", false, 0.0);
-		SetMeshVisible(RSUtils.CFG_Clip + "02", false, 0.0);
-		SetMeshVisible(RSUtils.CFG_Clip + "03", false, 0.0);
-		SetMeshVisible(RSUtils.CFG_Clip + "04", false, 0.0);
+		SetMeshVisible(RSUtils.CFG_Pole + "01", false, 0.0f);
+		SetMeshVisible(RSUtils.CFG_Pole + "02", false, 0.0f);
+		SetMeshVisible(RSUtils.CFG_Pole + "03", false, 0.0f);
+		SetMeshVisible(RSUtils.CFG_Pole + "04", false, 0.0f);
+		SetMeshVisible(RSUtils.CFG_Clip + "01", false, 0.0f);
+		SetMeshVisible(RSUtils.CFG_Clip + "02", false, 0.0f);
+		SetMeshVisible(RSUtils.CFG_Clip + "03", false, 0.0f);
+		SetMeshVisible(RSUtils.CFG_Clip + "04", false, 0.0f);
 
-		string CfgTag = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
-		if (CfgTag != null)
+		string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
+		if (MeshName != null)
 		{
-			SetMeshVisible(CfgTag, (bool) (Customization & RSUtils.Default_PoleValuesAll), 0.0);
+			SetMeshVisible(MeshName, (bool) (Customization & RSUtils.Default_PoleValuesAll), 0.0f);
 		}
 
-		CfgTag = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
-		if (CfgTag != null)
+		MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
+		if (MeshName != null)
 		{
-			SetMeshVisible(CfgTag, (bool) (Customization & RSUtils.Default_PoleValuesAll), 0.0);
+			SetMeshVisible(MeshName, (bool) (Customization & RSUtils.Default_PoleValuesAll), 0.0f);
 		}
 
 		// Sign type
@@ -310,8 +107,8 @@ class DZBase isclass MapObject
 		for (i = 0; i < SignEntries.size(); ++i)
 		{
 			string MeshName = RSUtils.GetSignConfigTag(i);
-			SetMeshVisible(MeshName, i == SignSelection, 0.0);
-			SetMeshTranslation(MeshName, 0.0, 0.0, RSUtils.GetSignHeightFromPole(Customization));
+			SetMeshVisible(MeshName, i == SignSelection, 0.0f);
+			SetMeshTranslation(MeshName, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
 		}
 	}
 
@@ -319,34 +116,42 @@ class DZBase isclass MapObject
 	void UpdateSignPoleMesh(int NewPoleBit)
 	{
 		// Reset previous mesh if it is a valid mesh name
-		string CfgTag = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
-		if (CfgTag != null)
+		string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
+		if (MeshName != null)
 		{
 			//Hhide pole mesh
-			SetMeshVisible(CfgTag, false, 0.0); 
+			SetMeshVisible(MeshName, false, 0.0f); 
 
 			// Hide clip mesh
-			CfgTag = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
-			SetMeshVisible(CfgTag, false, 0.0); 
+			MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
+			SetMeshVisible(MeshName, false, 0.0f); 
 		}
 
 		// Clear pole bits
 		Customization = Customization & ~RSUtils.Default_PoleValuesAll;
 
 		// Assign new pole type
-		Customization = Customization | (Customization & RSUtils.Default_PoleValuesAll) | NewPoleBit;
+		Customization = Customization | NewPoleBit;
 
 		// Make the new mesh visible if it is a valid mesh name
-		CfgTag = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
-		if (CfgTag != null)
+		MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
+		if (MeshName != null)
 		{
 			// Show pole mesh
-			SetMeshVisible(CfgTag, true, 0.0); 
+			SetMeshVisible(MeshName, true, 0.0f); 
 
 			// Show clip mesh
-			CfgTag = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
-			SetMeshVisible(CfgTag, true, 0.0); 
+			MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
+			SetMeshVisible(MeshName, true, 0.0f); 
 		}
+	}
+
+	// Call this once to flip the sign base state
+	void UpdateSignBaseMesh()
+	{
+		// Flip the sign base bit
+		Customization = Customization ^ RSUtils.BaseEnable_Bit;
+		SetMeshVisible(RSUtils.CFG_Base, (bool) (Customization & RSUtils.BaseEnable_Bit), 0.0f);
 	}
 	
 	// ======================
@@ -385,7 +190,7 @@ class DZBase isclass MapObject
 		string html = "<html><body>"+
 			"<table width=100% bgcolor=#333333>"+
 				"<tr>"+
-					"<td bgcolor=#EECFA1 colspan=6 align=center><font size=5 face=Consolas color=#000000><b>DOPRAVNÍ ZNAČKY - " + Title + "</b></font></td>"+
+					"<td bgcolor=#EECFA1 colspan=6 align=center><font size=5 face=Consolas color=#000000><b>" + RSUtils.TEXT_TitleHTML + " - " + Title + "</b></font></td>"+
 				"</tr>";
 
 		// Sign - Base
@@ -394,18 +199,18 @@ class DZBase isclass MapObject
 
 			html = html +
 				"<tr height=30>"+
-					"<td colspan=6><font size=2 face=Consolas color=#ffffff> Základ " + RSUtils.Checkbox(RSUtils.TAG_SignBase, bShowBase) +"</font></td>"+
+					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_BaseHTML + " " + RSUtils.Checkbox(RSUtils.TAG_SignBase, bShowBase) +"</font></td>"+
 				"</tr>";
 		}
 
 		// Sign - Pole and Clip
 		{
 			string PoleHtmlText = RSUtils.GetCurrentSignPoleHtmlText(Customization);
-			int Value = Customization & RSUtils.Default_PoleValuesAll;
+			int PoleValue = Customization & RSUtils.Default_PoleValuesAll;
 
 			html = html +
 				"<tr height=30>"+
-					"<td colspan=6><font size=2 face=Consolas color=#ffffff> Sloup " + RSUtils.InputField(RSUtils.TAG_SignPole + "/" + Value, "Zadej", PoleHtmlText) +"</font></td>"+
+					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_PoleHTML + " " + RSUtils.InputField(RSUtils.TAG_SignPole + "/" + PoleValue, "Zadej", PoleHtmlText) +"</font></td>"+
 				"</tr>";
 		}
 
@@ -413,6 +218,7 @@ class DZBase isclass MapObject
 		if (SignEntries[SignSelection].InputType != RSUtils.INPUT_None)
 		{
 			// This road sign requires additional input data
+			string Tooltip = "Zadej";
 			if (AdditionalSignData == null)
 			{
 				// Default value
@@ -420,12 +226,15 @@ class DZBase isclass MapObject
 				{
 					case RSUtils.INPUT_Int:
 						AdditionalSignData = RSUtils.FormatIntInput((int) SignEntries[SignSelection].AdditionalData);
+						Tooltip = "Zadej rychlost na značce";
 						break;
 					case RSUtils.INPUT_Float:
 						AdditionalSignData = RSUtils.FormatFloatInput(SignEntries[SignSelection].AdditionalData);
+						Tooltip = "Zadej číslo na značce";
 						break;
 					case RSUtils.INPUT_Sign:
 						AdditionalSignData = ""; // TODO
+						Tooltip = "Zadej text na značce";
 						break;
 					default:
 						break;
@@ -434,7 +243,7 @@ class DZBase isclass MapObject
 
 			html = html +
 				"<tr height=30>"+
-					"<td colspan=6><font size=2 face=Consolas color=#ffffff> Data navíc " + RSUtils.InputField(RSUtils.TAG_InputEntry + "/" + SignSelection, "Zadej", AdditionalSignData) +"</font></td>"+
+					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_ExtraDataHTML + " " + RSUtils.InputField(RSUtils.TAG_InputEntry + "/" + SignSelection, Tooltip, AdditionalSignData) +"</font></td>"+
 				"</tr>";
 		}
 
@@ -475,12 +284,10 @@ class DZBase isclass MapObject
 			case RSUtils.TAG_SignSelection:
 			{
 				bool bOld230cmPoleOption = SignEntries[SignSelection].bPole230cmOnly;
-				SetMeshVisible(RSUtils.GetSignConfigTag(SignSelection), false, 0.0);
+				SetMeshVisible(RSUtils.GetSignConfigTag(SignSelection), false, 0.0f);
 
 				SignSelection = Str.ToInt(TagParser[1]);
-
-				string NewSignMesh = RSUtils.GetSignConfigTag(SignSelection);
-				SetMeshVisible(NewSignMesh, true, 0.0);
+				
 				bool bNew230cmPoleOption = SignEntries[SignSelection].bPole230cmOnly;
 				AdditionalSignData = "";
 
@@ -500,16 +307,25 @@ class DZBase isclass MapObject
 						UpdateSignPoleMesh(RSUtils.Pole_300cm);
 					}
 				}
+				else if (Customization & RSUtils.BaseEnable_Bit)
+				{
+					// Hide sign base if there is no sign pole
+					UpdateSignBaseMesh();
+				}
 
-				SetMeshTranslation(NewSignMesh, 0.0, 0.0, RSUtils.GetSignHeightFromPole(Customization));
+				string NewSignMesh = RSUtils.GetSignConfigTag(SignSelection);
+				SetMeshVisible(NewSignMesh, true, 0.0f);
+				SetMeshTranslation(NewSignMesh, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
 				
 				break;
 			}
 			case RSUtils.TAG_SignBase:
 			{
-				// Flip the sign base bit
-				Customization = Customization ^ RSUtils.BaseEnable_Bit;
-				SetMeshVisible(RSUtils.CFG_Base, (bool) (Customization & RSUtils.BaseEnable_Bit), 0.0);
+				bool bIsPoleHidden = Customization & RSUtils.Pole_None;
+				if (!bIsPoleHidden)
+				{
+					UpdateSignBaseMesh();
+				}
 				break;
 			}
 			default:
@@ -626,8 +442,24 @@ class DZBase isclass MapObject
 				AdditionalSignData = value;
 				break;
 			case RSUtils.TAG_SignPole:
+			{
 				UpdateSignPoleMesh(RSUtils.GetSignPoleFlagFromHtmlText(value));
+
+				// Also move the sign to the correct location
+				string NewSignMesh = RSUtils.GetSignConfigTag(SignSelection);
+				SetMeshTranslation(NewSignMesh, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
+
+				// Pole types without 'no pole' option - Mask for clearing up pole selection bits
+				int PoleBitsExceptNone = RSUtils.Default_PoleValuesAll & ~RSUtils.Pole_None;
+				bool bIsPoleSelected = Customization & PoleBitsExceptNone;
+				if (!bIsPoleSelected and Customization & RSUtils.BaseEnable_Bit)
+				{
+					// Hide sign base if there is no sign pole
+					UpdateSignBaseMesh();
+				}
 				break;
+			}
+
 			default:
 				inherited(PropertyID, value);
 				break;

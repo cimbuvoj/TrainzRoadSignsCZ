@@ -20,6 +20,7 @@ class DZInformativniProvozni isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("IP 7 Přejezd pro cyklisty", 		"img/ip7.png");
 		SignEntries[EmplaceEntry()].SetData("IP 10a Slepá pozemní komunikace", 	"img/ip10a.png");
 		SignEntries[EmplaceEntry()].SetData("IP 10b Návěst před slepou pozemní komunikací", "img/ip10b.png");
+		
 		SignEntries[EmplaceEntry()].SetData("IP 11a Parkoviště", 							"img/ip11a.png");
 		SignEntries[EmplaceEntry()].SetData("IP 11b Parkoviště (kolmé nebo šikmé stání)", 	"img/ip11b.png");
 		SignEntries[EmplaceEntry()].SetData("IP 11c Parkoviště (podélné stání)", 			"img/ip11c.png");
