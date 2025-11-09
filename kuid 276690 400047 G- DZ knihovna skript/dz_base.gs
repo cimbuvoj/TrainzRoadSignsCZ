@@ -10,34 +10,27 @@ include "dz_lib.gs"
 // Configuration of each sign type
 class SignData
 {
-	public string Name;
-	public string ImagePath;
-	public int InputType = RSUtils.INPUT_None;
+	public string Name = null;
+	public string ImagePath = null;
+	public int SignFlags = 0;
 	public float AdditionalData = 0.0f;
-	public bool bPole230cmOnly = false;
 
-	public void SetData(string InName, string InImagePath, int InInputType, float InAdditionalData, bool bInPole230cmOnly)
+	public void SetData(string InName, string InImagePath, int InSignFlags, float InAdditionalData)
 	{
 		Name = InName;
 		ImagePath = InImagePath;
-		InputType = InInputType;
+		SignFlags = InSignFlags;
 		AdditionalData = InAdditionalData;
-		bPole230cmOnly = bInPole230cmOnly;
 	}
 
-	public void SetData(string InName, string InImagePath, int InInputType, float InAdditionalData)
+	public void SetData(string InName, string InImagePath, int InSignFlags)
 	{
-		SetData(InName, InImagePath, InInputType, InAdditionalData, false);
-	}
-
-	public void SetData(string InName, string InImagePath, bool bInPole230cmOnly)
-	{
-		SetData(InName, InImagePath, RSUtils.INPUT_None, 0.0f, bInPole230cmOnly);
+		SetData(InName, InImagePath, InSignFlags, 0.0f);
 	}
 
 	public void SetData(string InName, string InImagePath)
 	{
-		SetData(InName, InImagePath, RSUtils.INPUT_None, 0.0f, false);
+		SetData(InName, InImagePath, RSUtils.INPUT_None, 0.0f);
 	}
 };
 
@@ -100,6 +93,12 @@ class DZBase isclass MapObject
 		if (MeshName != null)
 		{
 			SetMeshVisible(MeshName, (bool) (Customization & RSUtils.Default_PoleValuesAll), 0.0f);
+			float ClipOffsetZ = 0.0f;
+			if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
+			{
+				ClipOffsetZ = -0.15f;
+			}
+			SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
 		}
 
 		// Sign type
@@ -142,7 +141,13 @@ class DZBase isclass MapObject
 
 			// Show clip mesh
 			MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
-			SetMeshVisible(MeshName, true, 0.0f); 
+			SetMeshVisible(MeshName, true, 0.0f);
+			float ClipOffsetZ = 0.0f;
+			if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
+			{
+				ClipOffsetZ = -0.15f;
+			}
+			SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
 		}
 	}
 
@@ -163,7 +168,7 @@ class DZBase isclass MapObject
 		inherited(Properties);
 
 		SignSelection 		= Properties.GetNamedTagAsInt(RSUtils.TAG_SignSelection, 0);
-		Customization		= Properties.GetNamedTagAsInt(RSUtils.TAG_SignPole, RSUtils.Pole_300cm | RSUtils.BaseEnable_Bit); // SignPole is a free saving tag
+		Customization		= Properties.GetNamedTagAsInt(RSUtils.TAG_SignPole, RSUtils.Default_Customization); // SignPole is a free saving tag
 		AdditionalSignData 	= Properties.GetNamedTag(RSUtils.TAG_SignAdditionalData);
 
 		ResetMeshes();
@@ -215,14 +220,16 @@ class DZBase isclass MapObject
 		}
 
 		// Sign - Additional data
-		if (SignEntries[SignSelection].InputType != RSUtils.INPUT_None)
+		int AdditionalInputSignFlags = SignEntries[SignSelection].SignFlags & RSUtils.INPUT_AdditionalInputFlags;
+		bool bIsAdditionalInputDefined = AdditionalInputSignFlags & ~RSUtils.INPUT_None;
+		if (bIsAdditionalInputDefined)
 		{
 			// This road sign requires additional input data
 			string Tooltip = "Zadej";
 			if (AdditionalSignData == null)
 			{
 				// Default value
-				switch (SignEntries[SignSelection].InputType)
+				switch (AdditionalInputSignFlags)
 				{
 					case RSUtils.INPUT_Int:
 						AdditionalSignData = RSUtils.FormatIntInput((int) SignEntries[SignSelection].AdditionalData);
@@ -233,7 +240,7 @@ class DZBase isclass MapObject
 						Tooltip = "Zadej číslo na značce";
 						break;
 					case RSUtils.INPUT_Sign:
-						AdditionalSignData = ""; // TODO
+						AdditionalSignData = ""; // TODO?
 						Tooltip = "Zadej text na značce";
 						break;
 					default:
@@ -283,12 +290,12 @@ class DZBase isclass MapObject
 		{
 			case RSUtils.TAG_SignSelection:
 			{
-				bool bOld230cmPoleOption = SignEntries[SignSelection].bPole230cmOnly;
+				bool bOld230cmPoleOption = SignEntries[SignSelection].SignFlags & RSUtils.INPUT_Pole230cm;
 				SetMeshVisible(RSUtils.GetSignConfigTag(SignSelection), false, 0.0f);
 
 				SignSelection = Str.ToInt(TagParser[1]);
 				
-				bool bNew230cmPoleOption = SignEntries[SignSelection].bPole230cmOnly;
+				bool bNew230cmPoleOption = SignEntries[SignSelection].SignFlags & RSUtils.INPUT_Pole230cm;
 				AdditionalSignData = "";
 
 				// Pole types without 'no pole' option - Mask for clearing up pole selection bits
@@ -305,6 +312,17 @@ class DZBase isclass MapObject
 					else if (bOld230cmPoleOption and !bNew230cmPoleOption)
 					{
 						UpdateSignPoleMesh(RSUtils.Pole_300cm);
+					}
+					else
+					{
+						// Move clip lower if it is required
+						string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
+						float ClipOffsetZ = 0.0f;
+						if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
+						{
+							ClipOffsetZ = -0.15f;
+						}
+						SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
 					}
 				}
 				else if (Customization & RSUtils.BaseEnable_Bit)
@@ -381,13 +399,14 @@ class DZBase isclass MapObject
 			case RSUtils.TAG_InputEntry:
 			{
 				int CurrentSignSelection = Str.ToInt(TagParser[1]);
-				switch (SignEntries[CurrentSignSelection].InputType)
+				int AdditionalInputSignFlags = SignEntries[SignSelection].SignFlags & RSUtils.INPUT_AdditionalInputFlags;
+				switch (AdditionalInputSignFlags)
 				{
 					case RSUtils.INPUT_Int:
-						// Any integer, speed can be up to 150 now
-						return "int,0,150,1";
+						// Any integer, speed can be up to 150kph now in CZ
+						return "int,0,150,5";
 					case RSUtils.INPUT_Float:
-						// Usually for width of vehicles, 9.9 is enough
+						// Usually for width or height of vehicles, 9.9 is enough
 						return "float,0,9.9,0.1";
 					case RSUtils.INPUT_Sign:
 						return "string";
@@ -413,7 +432,7 @@ class DZBase isclass MapObject
 		{
 			string[] ret = new string[0];
 			ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.Pole_None);
-			if (SignEntries[SignSelection].bPole230cmOnly)
+			if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_Pole230cm)
 			{
 				ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.Pole_230cm);
 			}
@@ -446,10 +465,19 @@ class DZBase isclass MapObject
 				UpdateSignPoleMesh(RSUtils.GetSignPoleFlagFromHtmlText(value));
 
 				// Also move the sign to the correct location
-				string NewSignMesh = RSUtils.GetSignConfigTag(SignSelection);
-				SetMeshTranslation(NewSignMesh, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
+				string MeshName = RSUtils.GetSignConfigTag(SignSelection);
+				SetMeshTranslation(MeshName, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
 
-				// Pole types without 'no pole' option - Mask for clearing up pole selection bits
+				// Move clip lower if it is required
+				MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
+				float ClipOffsetZ = 0.0f;
+				if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
+				{
+					ClipOffsetZ = -0.15f;
+				}
+				SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
+
+				// COnsider sign base that should not be visible when there is no pole
 				int PoleBitsExceptNone = RSUtils.Default_PoleValuesAll & ~RSUtils.Pole_None;
 				bool bIsPoleSelected = Customization & PoleBitsExceptNone;
 				if (!bIsPoleSelected and Customization & RSUtils.BaseEnable_Bit)

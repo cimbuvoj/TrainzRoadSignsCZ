@@ -15,10 +15,14 @@ static final class RSUtils
 	define public int TAG_SignAdditionalData = 103;
 	define public int TAG_SignBase			 = 104;
 
-	define public int INPUT_None 	= 0;
-	define public int INPUT_Int		= 1;
-	define public int INPUT_Float 	= 2;
-	define public int INPUT_Sign	= 3;
+	define public int INPUT_None 	= 1 << 0;
+	define public int INPUT_Int		= 1 << 1;
+	define public int INPUT_Float 	= 1 << 2;
+	define public int INPUT_Sign	= 1 << 3;
+	define public int INPUT_Pole230cm = 1 << 4;
+	define public int INPUT_LowerClip = 1 << 5;
+
+	define public int INPUT_AdditionalInputFlags = INPUT_None | INPUT_Int | INPUT_Float | INPUT_Sign;
 
 	define public int Pole_None 	= 1 << 0;
 	define public int Pole_100cm 	= 1 << 1;
@@ -210,7 +214,7 @@ static final class RSUtils
 		string FontColor = "#ffffff";
 		
 		// Highlighted signs will get highlighted text
-		if (Str.Find(ImagePath, "z", ImagePath.size() - 5) > 0)
+		if (ImagePath and Str.Find(ImagePath, "z", ImagePath.size() - 5) > 0)
 		{
 			FontColor = "#F4E601";
 		}

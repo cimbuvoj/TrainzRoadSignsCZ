@@ -11,7 +11,7 @@ class DZUpravujiciPrednost isclass DZBase
 	{
 		inherited();
 
-		SignEntries[EmplaceEntry()].SetData("P 1 Křižovatka s vedlejší pozemní komunikací", "img/p1.png");
+		SignEntries[EmplaceEntry()].SetData("P 1 Křižovatka s vedlejší pozemní komunikací", "img/p1.png", RSUtils.INPUT_LowerClip);
 		SignEntries[EmplaceEntry()].SetData("P 2 Hlavní pozemní komunikace", 				"img/p2.png");
 		SignEntries[EmplaceEntry()].SetData("P 3 Konec hlavní pozemní komunikace", 			"img/p3.png");
 		SignEntries[EmplaceEntry()].SetData("P 4 Dej přednost v jízdě!", 					"img/p4.png");
