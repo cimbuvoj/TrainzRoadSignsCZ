@@ -1,12 +1,13 @@
-// =================================
-// dz_lib.gs
-// Author: Vojtech Cimbura, 2025
-// =================================
+/// ============================================
+/// @file   dz_lib.gs
+/// @author Vojtech Cimbura, 2025
+/// ============================================
+
 
 include "Library.gs"
 
 
-// Road Sign Utils, helper class
+/// @brief Helper class (Road Sign Utils)
 static final class RSUtils
 {
 	define public int TAG_SignSelection 	 = 100;
@@ -40,19 +41,24 @@ static final class RSUtils
 	define public string CFG_Clip = "svorka";
 	define public string CFG_Sign = "znacka";
 
-	define public string TEXT_Pole_None = "Žádný";
-	define public string TEXT_Pole_100cm = "1 metr";
-	define public string TEXT_Pole_200cm = "2 metry";
-	define public string TEXT_Pole_300cm = "3 metry";
-	define public string TEXT_Pole_230cm = "2.3 metru";
-	define public string TEXT_BaseHTML = "Základ";
-	define public string TEXT_PoleHTML = "Sloup";
+	// HTML strings (You can localize without using the stringtable provided by Trainz)
+	define public string TEXT_Pole_None		= "Žádný";
+	define public string TEXT_Pole_100cm 	= "1 metr";
+	define public string TEXT_Pole_200cm 	= "2 metry";
+	define public string TEXT_Pole_300cm 	= "3 metry";
+	define public string TEXT_Pole_230cm 	= "2.3 metru";
+	define public string TEXT_BaseHTML 		= "Základ";
+	define public string TEXT_PoleHTML 		= "Sloup";
 	define public string TEXT_ExtraDataHTML = "Data navíc";
-	define public string TEXT_TitleHTML = "DOPRAVNÍ ZNAČKY";
+	define public string TEXT_NoBaseHTML 	= "Nelze vybrat";
+	define public string TEXT_TitleHTML 	= "DOPRAVNÍ ZNAČKY";
+	define public string TEXT_ChooseHTML 	= "Vyber";
+	define public string TEXT_EnterHTML 	= "Zadej";
 
-	// ======================
+
+	// ============================================
 	// Functions
-	// ======================
+	// ============================================
 	public float floor(float InValue)
 	{
 		int Tmp = (int) InValue;
@@ -84,6 +90,13 @@ static final class RSUtils
 		Value = Math.Min(Value, 150);
 		
 		return (string) Value;
+	}
+
+	public bool IsSignPoleVisible(int Customization)
+	{
+		int PoleBitsExceptNone = RSUtils.Default_PoleValuesAll & ~RSUtils.Pole_None;
+		bool bIsPoleSelected = Customization & PoleBitsExceptNone;
+		return bIsPoleSelected;
 	}
 
 	public int GetSignPoleFlagFromHtmlText(string PoleHtmlText)

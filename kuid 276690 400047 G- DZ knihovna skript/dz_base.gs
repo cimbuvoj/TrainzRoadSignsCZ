@@ -1,18 +1,22 @@
-// =================================
-// dz_base.gs
-// Author: Vojtech Cimbura, 2025
-// =================================
+/// ============================================
+/// @file   dz_base.gs
+/// @author Vojtech Cimbura, 2025
+/// ============================================
 
 include "MapObject.gs"
 include "dz_lib.gs"
 
 
-// Configuration of each sign type
+/// @brief Configuration holder of each sign
 class SignData
 {
+	/// @brief Shown HTML text
 	public string Name = null;
+	/// @brief Relative path to the HTML image
 	public string ImagePath = null;
+	/// @brief Sign property flags, currently used bits 1-6, see INPUT_<Name> in RSUtils
 	public int SignFlags = 0;
+	/// @brief Sign additional data, such as speed or maximum vehicle weight specified on the sign by default
 	public float AdditionalData = 0.0f;
 
 	public void SetData(string InName, string InImagePath, int InSignFlags, float InAdditionalData)
@@ -34,24 +38,107 @@ class SignData
 	}
 };
 
-// Base class for all sign, inherit from it to add other types and add entires in Init()
+/// @brief Base class for all sign, inherit from it to add other types and add entires in Init()
 class DZBase isclass MapObject
 {
-	// Array of entries for HTML, user defines a new entry and everything else is handled internally
+	/// @brief  Array of entries for HTML, user defines a new entry and everything else is handled internally
 	public SignData[] SignEntries;
 
-	// Index of sign mesh that should be visible
+	/// @brief Index of sign mesh that should be visible
 	int SignSelection = 0;
 
-	// Flag field, currently used bits: 1-5 pole types, 16 sign base, rest free to use 
+	/// @brief Flag bitfield, currently used bits: 1-5 pole types, 16 sign base, rest free to use 
 	int Customization = RSUtils.Default_Customization;
 
-	// Additional data, such as speed or other values
+	/// @brief Additional data, such as speed or other values
 	string AdditionalSignData = null;
 
-	// ======================
-	// Functions
-	// ======================
+	// ============================================
+	// Function declarations
+	// ============================================
+
+	/// @brief Adds a new element into SignEntries
+	/// @return The index on which the newly added array element resides
+	public int EmplaceEntry();
+
+	/// @brief Ensures all sign related meshes are shown based on current configuration
+	void ApplyMeshes();
+
+	/// @brief Hides or shows the sign clip mesh, translates it to correct position
+	/// @param bState Whether to show or hide the sign clip mesh
+	void UpdateSignClipMesh(bool bState);
+
+	/// @brief Hides the sign pole mesh or shows the one specified by the incoming flag
+	/// @param NewPoleBit Type of sign pole mesh to show (or hide)
+	void UpdateSignPoleMesh(int NewPoleBit);
+
+	/// @brief Hides or shows the sign base mesh
+	/// @param bState Whether to show or hide the sign base mesh
+	void UpdateSignBaseMesh(bool bState);
+
+	/// @brief Restores object state with a Soup object returned from a previous call to GetProperties()
+	/// @detail Called by Trainz whenever this objec should *LOAD* it's configuration
+	/// @param Properties Reference to soup to be saved to session
+	public void SetProperties(Soup Properties);
+
+	/// @brief Restores object state with a Soup object returned from a previous call to GetProperties()
+	/// @detail Called by Trainz whenever this objec should *SAVE* it's configuration
+	/// @return Soup object containing data appropriate to represent the configured state of the object
+	public Soup GetProperties();
+
+	/// @brief Construct HTML for this sign object
+	/// @param Title Sign title category to display at the top
+	/// @return Valid HTML in a string
+	public string CreateHTML(string Title);
+
+	/// @brief Called by Trainz when the player clicks on a "link" property type (checkbox, radio button)
+	/// @param PropertyID Name of property
+	public void LinkPropertyValue(string PropertyID);
+
+	/// @brief Called by Trainz to get a string representation of the current name of the selected property
+	/// @param PropertyID Name of property
+	/// @return The name of the current property
+	public string GetPropertyName(string PropertyID);
+
+	/// @brief Called by Trainz to get a string representation of the current value of the selected property, if possible
+	/// @param PropertyID Name of property
+	/// @return A string representation of the value of the current property
+	public string GetPropertyValue(string PropertyID);
+
+	/// @brief Called by Trainz to determine the type of the named property in HTML
+	/// @param PropertyID Name of property
+	/// @return The type of the current property
+	public string GetPropertyType(string PropertyID);
+
+	/// @brief Called by Trainz to retrieve a list possible values for a named property, used for the "list" type
+	/// @param PropertyID Name of property
+	/// @return A string array for the player to select a value from
+	public string[] GetPropertyElementList(string PropertyID);
+
+	/// @brief Sets a new value for the named property
+	/// @detail The variant called depends on the property type, as returned by GetPropertyType()
+	/// @param PropertyID Name of property
+	/// @param value Value to assign to the property
+	public void SetPropertyValue(string PropertyID, string value);
+
+	/// @brief Sets a new value for the named property
+	/// @detail The variant called depends on the property type, as returned by GetPropertyType()
+	/// @param PropertyID Name of property
+	/// @param value Value to assign to the property
+	public void SetPropertyValue(string PropertyID, int value);
+
+	/// @brief Sets a new value for the named property
+	/// @detail The variant called depends on the property type, as returned by GetPropertyType()
+	/// @param PropertyID Name of property
+	/// @param value Value to assign to the property
+	public void SetPropertyValue(string PropertyID, float value);
+
+
+	// ============================================
+	// Function definitions
+	// ============================================
+
+	// -----------------------------------------------------------
 	void Init()
 	{
 		inherited();
@@ -59,7 +146,7 @@ class DZBase isclass MapObject
 		SignEntries = new SignData[0];
 	}
 
-	// Adds a new element into SignEntries and returns the index on which the new array element resides
+	// -----------------------------------------------------------
 	public int EmplaceEntry()
 	{
 		int Index = SignEntries.size();
@@ -67,32 +154,43 @@ class DZBase isclass MapObject
 		return Index;
 	}
 
-	// When this object is loaded, we need to reset all visible meshes and show the ones we should show
-	void ResetMeshes()
+	// -----------------------------------------------------------
+	void ApplyMeshes()
 	{
-		// Sign base
-		SetMeshVisible(RSUtils.CFG_Base, (bool) (Customization & RSUtils.BaseEnable_Bit), 0.0f);
-
-		// Sign pole + clip
-		SetMeshVisible(RSUtils.CFG_Pole + "01", false, 0.0f);
-		SetMeshVisible(RSUtils.CFG_Pole + "02", false, 0.0f);
-		SetMeshVisible(RSUtils.CFG_Pole + "03", false, 0.0f);
-		SetMeshVisible(RSUtils.CFG_Pole + "04", false, 0.0f);
-		SetMeshVisible(RSUtils.CFG_Clip + "01", false, 0.0f);
-		SetMeshVisible(RSUtils.CFG_Clip + "02", false, 0.0f);
-		SetMeshVisible(RSUtils.CFG_Clip + "03", false, 0.0f);
-		SetMeshVisible(RSUtils.CFG_Clip + "04", false, 0.0f);
-
+		// Apply sign pole and clip
 		string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
 		if (MeshName != null)
 		{
-			SetMeshVisible(MeshName, (bool) (Customization & RSUtils.Default_PoleValuesAll), 0.0f);
+			SetMeshVisible(MeshName, true, 0.0f);
 		}
 
 		MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
 		if (MeshName != null)
 		{
-			SetMeshVisible(MeshName, (bool) (Customization & RSUtils.Default_PoleValuesAll), 0.0f);
+			UpdateSignClipMesh(true);
+		}
+
+		// Sign base
+		SetMeshVisible(RSUtils.CFG_Base, (bool) (Customization & RSUtils.BaseEnable_Bit), 0.0f);
+
+		// Sign type
+		int i;
+		for (i = 0; i < SignEntries.size(); ++i)
+		{
+			MeshName = RSUtils.GetSignConfigTag(i);
+			SetMeshVisible(MeshName, i == SignSelection, 0.0f);
+			SetMeshTranslation(MeshName, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
+		}
+	}
+
+	// -----------------------------------------------------------
+	void UpdateSignClipMesh(bool bState)
+	{
+		string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
+		SetMeshVisible(MeshName, bState, 0.0f);
+		
+		if (bState)
+		{
 			float ClipOffsetZ = 0.0f;
 			if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
 			{
@@ -100,30 +198,18 @@ class DZBase isclass MapObject
 			}
 			SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
 		}
-
-		// Sign type
-		int i;
-		for (i = 0; i < SignEntries.size(); ++i)
-		{
-			string MeshName = RSUtils.GetSignConfigTag(i);
-			SetMeshVisible(MeshName, i == SignSelection, 0.0f);
-			SetMeshTranslation(MeshName, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
-		}
 	}
 
-	// Sets the customization bit for sign pole to defined value and updates meshes accordingly
+	// -----------------------------------------------------------
 	void UpdateSignPoleMesh(int NewPoleBit)
 	{
 		// Reset previous mesh if it is a valid mesh name
 		string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
 		if (MeshName != null)
 		{
-			//Hhide pole mesh
+			// Hide pole and clip mesh
 			SetMeshVisible(MeshName, false, 0.0f); 
-
-			// Hide clip mesh
-			MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
-			SetMeshVisible(MeshName, false, 0.0f); 
+			UpdateSignClipMesh(false);
 		}
 
 		// Clear pole bits
@@ -136,33 +222,22 @@ class DZBase isclass MapObject
 		MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
 		if (MeshName != null)
 		{
-			// Show pole mesh
-			SetMeshVisible(MeshName, true, 0.0f); 
-
-			// Show clip mesh
-			MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
+			// Show pole and clip mesh
 			SetMeshVisible(MeshName, true, 0.0f);
-			float ClipOffsetZ = 0.0f;
-			if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
-			{
-				ClipOffsetZ = -0.15f;
-			}
-			SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
+			UpdateSignClipMesh(true);
 		}
 	}
 
-	// Call this once to flip the sign base state
-	void UpdateSignBaseMesh()
+	// -----------------------------------------------------------
+	void UpdateSignBaseMesh(bool bState)
 	{
-		// Flip the sign base bit
-		Customization = Customization ^ RSUtils.BaseEnable_Bit;
-		SetMeshVisible(RSUtils.CFG_Base, (bool) (Customization & RSUtils.BaseEnable_Bit), 0.0f);
+		int NewValue = ((int)bState) * RSUtils.BaseEnable_Bit;
+		Customization = Customization & ~RSUtils.BaseEnable_Bit;
+		Customization = Customization | NewValue;
+		SetMeshVisible(RSUtils.CFG_Base, bState, 0.0f);
 	}
-	
-	// ======================
-	// Save and Load
-	// ======================
-	// Load
+
+	// -----------------------------------------------------------
 	public void SetProperties(Soup Properties)
 	{
 		inherited(Properties);
@@ -171,10 +246,10 @@ class DZBase isclass MapObject
 		Customization		= Properties.GetNamedTagAsInt(RSUtils.TAG_SignPole, RSUtils.Default_Customization); // SignPole is a free saving tag
 		AdditionalSignData 	= Properties.GetNamedTag(RSUtils.TAG_SignAdditionalData);
 
-		ResetMeshes();
+		ApplyMeshes();
 	}
 
-	// Save
+	// -----------------------------------------------------------
 	public Soup GetProperties()
 	{
 		Soup Properties = inherited();
@@ -189,6 +264,8 @@ class DZBase isclass MapObject
 	// ======================
 	// HTML
 	// ======================
+
+	// -----------------------------------------------------------
 	public string CreateHTML(string Title)
 	{
 		// HTML window base
@@ -201,10 +278,15 @@ class DZBase isclass MapObject
 		// Sign - Base
 		{
 			bool bShowBase = Customization & RSUtils.BaseEnable_Bit;
+			string BaseHtml = RSUtils.TEXT_NoBaseHTML;
+			if (RSUtils.IsSignPoleVisible(Customization))
+			{
+				BaseHtml = RSUtils.Checkbox(RSUtils.TAG_SignBase, bShowBase);
+			}
 
 			html = html +
 				"<tr height=30>"+
-					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_BaseHTML + " " + RSUtils.Checkbox(RSUtils.TAG_SignBase, bShowBase) +"</font></td>"+
+					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_BaseHTML + ": " + BaseHtml +"</font></td>"+
 				"</tr>";
 		}
 
@@ -215,7 +297,7 @@ class DZBase isclass MapObject
 
 			html = html +
 				"<tr height=30>"+
-					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_PoleHTML + " " + RSUtils.InputField(RSUtils.TAG_SignPole + "/" + PoleValue, "Zadej", PoleHtmlText) +"</font></td>"+
+					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_PoleHTML + " : " + RSUtils.InputField(RSUtils.TAG_SignPole + "/" + PoleValue, RSUtils.TEXT_EnterHTML, PoleHtmlText) +"</font></td>"+
 				"</tr>";
 		}
 
@@ -225,7 +307,6 @@ class DZBase isclass MapObject
 		if (bIsAdditionalInputDefined)
 		{
 			// This road sign requires additional input data
-			string Tooltip = "Zadej";
 			if (AdditionalSignData == null)
 			{
 				// Default value
@@ -233,15 +314,12 @@ class DZBase isclass MapObject
 				{
 					case RSUtils.INPUT_Int:
 						AdditionalSignData = RSUtils.FormatIntInput((int) SignEntries[SignSelection].AdditionalData);
-						Tooltip = "Zadej rychlost na značce";
 						break;
 					case RSUtils.INPUT_Float:
 						AdditionalSignData = RSUtils.FormatFloatInput(SignEntries[SignSelection].AdditionalData);
-						Tooltip = "Zadej číslo na značce";
 						break;
 					case RSUtils.INPUT_Sign:
 						AdditionalSignData = ""; // TODO?
-						Tooltip = "Zadej text na značce";
 						break;
 					default:
 						break;
@@ -250,7 +328,7 @@ class DZBase isclass MapObject
 
 			html = html +
 				"<tr height=30>"+
-					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_ExtraDataHTML + " " + RSUtils.InputField(RSUtils.TAG_InputEntry + "/" + SignSelection, Tooltip, AdditionalSignData) +"</font></td>"+
+					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_ExtraDataHTML + " " + RSUtils.InputField(RSUtils.TAG_InputEntry + "/" + SignSelection, RSUtils.TEXT_EnterHTML, AdditionalSignData) +"</font></td>"+
 				"</tr>";
 		}
 
@@ -281,6 +359,7 @@ class DZBase isclass MapObject
 		return html + "</table></body></html>";
 	}
 
+	// -----------------------------------------------------------
 	public void LinkPropertyValue(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -290,59 +369,54 @@ class DZBase isclass MapObject
 		{
 			case RSUtils.TAG_SignSelection:
 			{
+				string MeshName = RSUtils.GetSignConfigTag(SignSelection);
+				SetMeshVisible(MeshName, false, 0.0f);
+
 				bool bOld230cmPoleOption = SignEntries[SignSelection].SignFlags & RSUtils.INPUT_Pole230cm;
-				SetMeshVisible(RSUtils.GetSignConfigTag(SignSelection), false, 0.0f);
 
 				SignSelection = Str.ToInt(TagParser[1]);
 				
 				bool bNew230cmPoleOption = SignEntries[SignSelection].SignFlags & RSUtils.INPUT_Pole230cm;
 				AdditionalSignData = "";
 
-				// Pole types without 'no pole' option - Mask for clearing up pole selection bits
-				int PoleBitsExceptNone = RSUtils.Default_PoleValuesAll & ~RSUtils.Pole_None;
-				bool bIsPoleSelected = Customization & PoleBitsExceptNone;
-				if (bIsPoleSelected)
+				// Update sign pole and clip position
+				if (RSUtils.IsSignPoleVisible(Customization))
 				{
-					// Switching from default pole type to special pole type?
 					if (!bOld230cmPoleOption and bNew230cmPoleOption)
 					{
+						// Switching from default pole type to special pole type
 						UpdateSignPoleMesh(RSUtils.Pole_230cm);
-					}
-					// Switching from special pole type to default type?
+					}					
 					else if (bOld230cmPoleOption and !bNew230cmPoleOption)
 					{
+						// Switching from special pole type to default type
 						UpdateSignPoleMesh(RSUtils.Pole_300cm);
 					}
 					else
 					{
-						// Move clip lower if it is required
-						string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
-						float ClipOffsetZ = 0.0f;
-						if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
-						{
-							ClipOffsetZ = -0.15f;
-						}
-						SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
+						// Just update the clip position
+						UpdateSignClipMesh(true);
 					}
 				}
 				else if (Customization & RSUtils.BaseEnable_Bit)
 				{
-					// Hide sign base if there is no sign pole
-					UpdateSignBaseMesh();
+					// Hide sign base as there is no sign pole
+					UpdateSignBaseMesh(false);
 				}
 
-				string NewSignMesh = RSUtils.GetSignConfigTag(SignSelection);
-				SetMeshVisible(NewSignMesh, true, 0.0f);
-				SetMeshTranslation(NewSignMesh, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
+				MeshName = RSUtils.GetSignConfigTag(SignSelection);
+				SetMeshVisible(MeshName, true, 0.0f);
+				SetMeshTranslation(MeshName, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
 				
 				break;
 			}
 			case RSUtils.TAG_SignBase:
 			{
-				bool bIsPoleHidden = Customization & RSUtils.Pole_None;
-				if (!bIsPoleHidden)
+				if (RSUtils.IsSignPoleVisible(Customization))
 				{
-					UpdateSignBaseMesh();
+					// Checkbox flip flop
+					bool bBaseVisible = (bool) (Customization & RSUtils.BaseEnable_Bit);
+					UpdateSignBaseMesh(!bBaseVisible);
 				}
 				break;
 			}
@@ -351,7 +425,7 @@ class DZBase isclass MapObject
 		}
 	}
 
-	// Sets the input dialog window title
+	// -----------------------------------------------------------
 	public string GetPropertyName(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -360,9 +434,9 @@ class DZBase isclass MapObject
 		switch(nID)
 		{
 			case RSUtils.TAG_InputEntry:
-				return "Zadej";
+				return RSUtils.TEXT_EnterHTML;
 			case RSUtils.TAG_SignPole:
-				return "Vyber";
+				return RSUtils.TEXT_ChooseHTML;
 			default:
 				break;
 		}
@@ -370,7 +444,7 @@ class DZBase isclass MapObject
 		return inherited(PropertyID);
 	}
 
-	// Adds the current value to the input dialog
+	// -----------------------------------------------------------
 	public string GetPropertyValue(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -388,7 +462,7 @@ class DZBase isclass MapObject
 		return inherited(PropertyID);
 	}
 
-	// Determines data type for the input dialog
+	// -----------------------------------------------------------
 	public string GetPropertyType(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -422,7 +496,7 @@ class DZBase isclass MapObject
 		return "link";
     }
 
-    // Creates list of items based on the given property
+    // -----------------------------------------------------------
 	public string[] GetPropertyElementList(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -448,6 +522,7 @@ class DZBase isclass MapObject
 		return inherited(PropertyID);
 	}
 
+	// -----------------------------------------------------------
 	public void SetPropertyValue(string PropertyID, string value)
 	{
 		if (value == null or value == "") return;
@@ -464,26 +539,14 @@ class DZBase isclass MapObject
 			{
 				UpdateSignPoleMesh(RSUtils.GetSignPoleFlagFromHtmlText(value));
 
-				// Also move the sign to the correct location
+				// Also move the sign to the correct vertical position
 				string MeshName = RSUtils.GetSignConfigTag(SignSelection);
 				SetMeshTranslation(MeshName, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
 
-				// Move clip lower if it is required
-				MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
-				float ClipOffsetZ = 0.0f;
-				if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
-				{
-					ClipOffsetZ = -0.15f;
-				}
-				SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
-
-				// COnsider sign base that should not be visible when there is no pole
-				int PoleBitsExceptNone = RSUtils.Default_PoleValuesAll & ~RSUtils.Pole_None;
-				bool bIsPoleSelected = Customization & PoleBitsExceptNone;
-				if (!bIsPoleSelected and Customization & RSUtils.BaseEnable_Bit)
+				if (!RSUtils.IsSignPoleVisible(Customization))
 				{
 					// Hide sign base if there is no sign pole
-					UpdateSignBaseMesh();
+					UpdateSignBaseMesh(false);
 				}
 				break;
 			}
@@ -494,7 +557,7 @@ class DZBase isclass MapObject
 		}
 	}
 
-	// Additional data input for integer values
+	// -----------------------------------------------------------
 	public void SetPropertyValue(string PropertyID, int value)
 	{		
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -511,7 +574,7 @@ class DZBase isclass MapObject
 		}
 	}
 
-	// Additional data input for float values
+	// -----------------------------------------------------------
 	public void SetPropertyValue(string PropertyID, float value)
 	{		
 		string[] TagParser = Str.Tokens(PropertyID, "/");
