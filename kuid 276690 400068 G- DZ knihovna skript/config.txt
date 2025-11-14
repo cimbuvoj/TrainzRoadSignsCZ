@@ -1,5 +1,5 @@
 ﻿
-kuid                                    <kuid:276690:400047>
+kuid                                    <kuid:276690:400068>
 description                             "G- DZ knihovna skriptu"
 category-class                          "HM"
 username                                "G- DZ knihovna skriptu"
@@ -22,5 +22,5 @@ thumbnails
 
 kuid-table
 {
-  dzlib                                 <kuid:276690:400047>
+  dzlib                                 <kuid:276690:400068>
 }
