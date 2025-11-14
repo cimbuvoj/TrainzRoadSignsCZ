@@ -48,7 +48,7 @@ class DZBase isclass MapObject
 	int SignSelection = 0;
 
 	/// @brief Flag bitfield, currently used bits: 1-5 pole types, 16 sign base, rest free to use 
-	int Customization = RSUtils.Default_Customization;
+	int Customization = RSUtils.CUST_DefaultValues;
 
 	/// @brief Additional data, such as speed or other values
 	string AdditionalSignData = null;
@@ -164,14 +164,10 @@ class DZBase isclass MapObject
 			SetMeshVisible(MeshName, true, 0.0f);
 		}
 
-		MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
-		if (MeshName != null)
-		{
-			UpdateSignClipMesh(true);
-		}
+		UpdateSignClipMesh(true);
 
 		// Sign base
-		SetMeshVisible(RSUtils.CFG_Base, (bool) (Customization & RSUtils.BaseEnable_Bit), 0.0f);
+		SetMeshVisible(RSUtils.CFG_Base, (bool) (Customization & RSUtils.CUST_Base), 0.0f);
 
 		// Sign type
 		int i;
@@ -207,13 +203,13 @@ class DZBase isclass MapObject
 		string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
 		if (MeshName != null)
 		{
-			// Hide pole and clip mesh
-			SetMeshVisible(MeshName, false, 0.0f); 
-			UpdateSignClipMesh(false);
+			// Hide pole mesh
+			SetMeshVisible(MeshName, false, 0.0f);
 		}
+		UpdateSignClipMesh(false);
 
 		// Clear pole bits
-		Customization = Customization & ~RSUtils.Default_PoleValuesAll;
+		Customization = Customization & ~RSUtils.CUST_PoleValuesAll;
 
 		// Assign new pole type
 		Customization = Customization | NewPoleBit;
@@ -222,17 +218,19 @@ class DZBase isclass MapObject
 		MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Pole, Customization);
 		if (MeshName != null)
 		{
-			// Show pole and clip mesh
+			// Show pole mesh
 			SetMeshVisible(MeshName, true, 0.0f);
-			UpdateSignClipMesh(true);
 		}
+
+		// Always update the position of the sign clip mesh
+		UpdateSignClipMesh(true);
 	}
 
 	// -----------------------------------------------------------
 	void UpdateSignBaseMesh(bool bState)
 	{
-		int NewValue = ((int)bState) * RSUtils.BaseEnable_Bit;
-		Customization = Customization & ~RSUtils.BaseEnable_Bit;
+		int NewValue = ((int)bState) * RSUtils.CUST_Base;
+		Customization = Customization & ~RSUtils.CUST_Base;
 		Customization = Customization | NewValue;
 		SetMeshVisible(RSUtils.CFG_Base, bState, 0.0f);
 	}
@@ -243,7 +241,7 @@ class DZBase isclass MapObject
 		inherited(Properties);
 
 		SignSelection 		= Properties.GetNamedTagAsInt(RSUtils.TAG_SignSelection, 0);
-		Customization		= Properties.GetNamedTagAsInt(RSUtils.TAG_SignPole, RSUtils.Default_Customization); // SignPole is a free saving tag
+		Customization		= Properties.GetNamedTagAsInt(RSUtils.TAG_SignPole, RSUtils.CUST_DefaultValues); // SignPole is a free saving tag
 		AdditionalSignData 	= Properties.GetNamedTag(RSUtils.TAG_SignAdditionalData);
 
 		ApplyMeshes();
@@ -277,7 +275,7 @@ class DZBase isclass MapObject
 
 		// Sign - Base
 		{
-			bool bShowBase = Customization & RSUtils.BaseEnable_Bit;
+			bool bShowBase = Customization & RSUtils.CUST_Base;
 			string BaseHtml = RSUtils.TEXT_NoBaseHTML;
 			if (RSUtils.IsSignPoleVisible(Customization))
 			{
@@ -293,7 +291,7 @@ class DZBase isclass MapObject
 		// Sign - Pole and Clip
 		{
 			string PoleHtmlText = RSUtils.GetCurrentSignPoleHtmlText(Customization);
-			int PoleValue = Customization & RSUtils.Default_PoleValuesAll;
+			int PoleValue = Customization & RSUtils.CUST_PoleValuesAll;
 
 			html = html +
 				"<tr height=30>"+
@@ -385,24 +383,22 @@ class DZBase isclass MapObject
 					if (!bOld230cmPoleOption and bNew230cmPoleOption)
 					{
 						// Switching from default pole type to special pole type
-						UpdateSignPoleMesh(RSUtils.Pole_230cm);
+						UpdateSignPoleMesh(RSUtils.CUST_Pole_230cm);
 					}					
 					else if (bOld230cmPoleOption and !bNew230cmPoleOption)
 					{
 						// Switching from special pole type to default type
-						UpdateSignPoleMesh(RSUtils.Pole_300cm);
-					}
-					else
-					{
-						// Just update the clip position
-						UpdateSignClipMesh(true);
+						UpdateSignPoleMesh(RSUtils.CUST_Pole_300cm);
 					}
 				}
-				else if (Customization & RSUtils.BaseEnable_Bit)
+				else if (Customization & RSUtils.CUST_Base)
 				{
 					// Hide sign base as there is no sign pole
 					UpdateSignBaseMesh(false);
 				}
+				
+				// Always update the sign clip mesh position
+				UpdateSignClipMesh(true);
 
 				MeshName = RSUtils.GetSignConfigTag(SignSelection);
 				SetMeshVisible(MeshName, true, 0.0f);
@@ -415,7 +411,7 @@ class DZBase isclass MapObject
 				if (RSUtils.IsSignPoleVisible(Customization))
 				{
 					// Checkbox flip flop
-					bool bBaseVisible = (bool) (Customization & RSUtils.BaseEnable_Bit);
+					bool bBaseVisible = (bool) (Customization & RSUtils.CUST_Base);
 					UpdateSignBaseMesh(!bBaseVisible);
 				}
 				break;
@@ -505,16 +501,16 @@ class DZBase isclass MapObject
 		if (nID == RSUtils.TAG_SignPole)
 		{
 			string[] ret = new string[0];
-			ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.Pole_None);
+			ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.CUST_Pole_None);
 			if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_Pole230cm)
 			{
-				ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.Pole_230cm);
+				ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.CUST_Pole_230cm);
 			}
 			else
 			{
-				ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.Pole_100cm);
-				ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.Pole_200cm);
-				ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.Pole_300cm);
+				ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.CUST_Pole_100cm);
+				ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.CUST_Pole_200cm);
+				ret[ret.size()] = RSUtils.GetCurrentSignPoleHtmlText(RSUtils.CUST_Pole_300cm);
 			}
 			return ret;
 		}

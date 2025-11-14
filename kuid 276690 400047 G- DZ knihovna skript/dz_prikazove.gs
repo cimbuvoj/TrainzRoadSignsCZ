@@ -1,10 +1,11 @@
-// =================================
-// dz_prikazove.gs
-// Author: Vojtech Cimbura, 2025
-// =================================
+/// ============================================
+/// @file   dz_prikazove.gs
+/// @author Vojtech Cimbura, 2025
+/// ============================================
 
 include "dz_base.gs"
 
+/// @brief Czech road signs, category "Příkazové dopravní značky"
 class DZPrikazove isclass DZBase
 {
 	void Init()
@@ -36,6 +37,9 @@ class DZPrikazove isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("C 14b Konec jiného příkazu", 				"img/c14b.png");
 	}
 	
+	/// @brief Construct HTML for the Trainz Property window of this object
+	/// @detail Called by Trainz when the HTML property windows should be summoned
+	/// @return HTML as a string
 	public string GetDescriptionHTML()
 	{
 		return CreateHTML("PŘÍKAZOVÉ");

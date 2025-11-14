@@ -1,10 +1,11 @@
-// =================================
-// dz_upravujici_prednost.gs
-// Author: Vojtech Cimbura, 2025
-// =================================
+/// ============================================
+/// @file   dz_upravujici_prednost.gs
+/// @author Vojtech Cimbura, 2025
+/// ============================================
 
 include "dz_base.gs"
 
+/// @brief Czech road signs, category "Dopravní značky upravující přednost"
 class DZUpravujiciPrednost isclass DZBase
 {
 	void Init()
@@ -22,7 +23,10 @@ class DZUpravujiciPrednost isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("P 7 Přednost protijedoucích vozidel", 			"img/p7.png");
 		SignEntries[EmplaceEntry()].SetData("P 8 Přednost před protijedoucími vozidly", 	"img/p8.png");
 	}
-	
+		
+	/// @brief Construct HTML for the Trainz Property window of this object
+	/// @detail Called by Trainz when the HTML property windows should be summoned
+	/// @return HTML as a string
 	public string GetDescriptionHTML()
 	{
 		return CreateHTML("UPRAVUJÍCÍ PŘEDNOST");

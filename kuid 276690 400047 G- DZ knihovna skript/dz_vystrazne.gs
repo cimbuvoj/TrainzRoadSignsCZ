@@ -1,18 +1,16 @@
-// =================================
-// dz_vystrazne.gs
-// Author: Vojtech Cimbura, 2025
-// =================================
+/// ============================================
+/// @file   dz_vystrazne.gs
+/// @author Vojtech Cimbura, 2025
+/// ============================================
 
 include "dz_base.gs"
 
+/// @brief Czech road signs, category "Výstražné dopravní značky"
 class DZVystrazne isclass DZBase
 {
 	void Init()
 	{
 		inherited();
-
-		// A31a-c have 230cm sign pole and cannot have any other
-		int InputSignFlags = RSUtils.INPUT_Pole230cm;
 
 		SignEntries[EmplaceEntry()].SetData("A 1a Zatáčka vpravo", 					"img/a1a.png", 	RSUtils.INPUT_LowerClip);
 		SignEntries[EmplaceEntry()].SetData("A 1b Zatáčka vlevo", 					"img/a1b.png", 	RSUtils.INPUT_LowerClip);
@@ -45,6 +43,9 @@ class DZVystrazne isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("A 31c Návěstní deska (80 m)",			"img/a31c.png", RSUtils.INPUT_Pole230cm);
 	}
 	
+	/// @brief Construct HTML for the Trainz Property window of this object
+	/// @detail Called by Trainz when the HTML property windows should be summoned
+	/// @return HTML as a string
 	public string GetDescriptionHTML()
 	{
 		return CreateHTML("VÝSTRAŽNÉ");

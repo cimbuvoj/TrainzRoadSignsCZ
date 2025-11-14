@@ -5,6 +5,7 @@
 
 include "dz_base.gs"
 
+/// @brief Czech road signs, category "Informativní dopravní značky provozní"
 class DZInformativniProvozni isclass DZBase
 {
 	void Init()
@@ -40,6 +41,9 @@ class DZInformativniProvozni isclass DZBase
 
 	}
 	
+	/// @brief Construct HTML for the Trainz Property window of this object
+	/// @detail Called by Trainz when the HTML property windows should be summoned
+	/// @return HTML as a string
 	public string GetDescriptionHTML()
 	{
 		return CreateHTML("INFORMATIVNÍ PROVOZNÍ");

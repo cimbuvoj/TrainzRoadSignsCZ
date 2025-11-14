@@ -1,8 +1,8 @@
 ﻿
-kuid                                    <kuid:276690:500166>
-description                             "G- DZ obdelnikove"
+kuid                                    <kuid:276690:500161>
+description                             "G- DZ informativni provozni"
 category-class                          "BR"
-username                                "G- DZ obdelnikove"
+username                                "G- DZ info-provozni"
 author                                  "Glocky, Wilks"
 contact-email                           "Mr.Glocky@seznam.cz"
 kind                                    "scenery"
@@ -85,7 +85,7 @@ mesh-table
   znacka01
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz01a.trainzmesh"
+    mesh                                "ip02.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -93,7 +93,7 @@ mesh-table
   znacka02
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz01b.trainzmesh"
+    mesh                                "ip03.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -101,7 +101,7 @@ mesh-table
   znacka03
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz02a.trainzmesh"
+    mesh                                "ip04b.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -109,7 +109,7 @@ mesh-table
   znacka04
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz02b.trainzmesh"
+    mesh                                "ip05.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -117,7 +117,7 @@ mesh-table
   znacka05
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz03a.trainzmesh"
+    mesh                                "ip06.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -125,7 +125,7 @@ mesh-table
   znacka06
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz11a.trainzmesh"
+    mesh                                "ip06-ref.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -133,7 +133,7 @@ mesh-table
   znacka07
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz11b.trainzmesh"
+    mesh                                "ip07.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -141,7 +141,7 @@ mesh-table
   znacka08
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz11c.trainzmesh"
+    mesh                                "ip10a.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -149,7 +149,7 @@ mesh-table
   znacka09
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz11d.trainzmesh"
+    mesh                                "ip10b.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -157,7 +157,7 @@ mesh-table
   znacka10
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz11e.trainzmesh"
+    mesh                                "iz11a.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -165,7 +165,7 @@ mesh-table
   znacka11
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz11f.trainzmesh"
+    mesh                                "iz11b.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -173,7 +173,7 @@ mesh-table
   znacka12
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz11g.trainzmesh"
+    mesh                                "iz11c.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -181,7 +181,7 @@ mesh-table
   znacka13
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz12.trainzmesh"
+    mesh                                "iz11d.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -189,7 +189,7 @@ mesh-table
   znacka14
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz13a.trainzmesh"
+    mesh                                "iz11e.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -197,7 +197,7 @@ mesh-table
   znacka15
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz13b.trainzmesh"
+    mesh                                "iz11f.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -205,7 +205,7 @@ mesh-table
   znacka16
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz13c.trainzmesh"
+    mesh                                "iz11g.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -213,7 +213,7 @@ mesh-table
   znacka17
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz13d.trainzmesh"
+    mesh                                "iz12.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -221,7 +221,7 @@ mesh-table
   znacka18
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz13e.trainzmesh"
+    mesh                                "iz13a.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -229,7 +229,7 @@ mesh-table
   znacka19
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz26a.trainzmesh"
+    mesh                                "iz13b.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -237,7 +237,7 @@ mesh-table
   znacka20
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz26b.trainzmesh"
+    mesh                                "iz13c.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
@@ -245,12 +245,44 @@ mesh-table
   znacka21
   {
     mesh-asset                          <kuid:276690:400067>
-    mesh                                "iz31a.trainzmesh"
+    mesh                                "iz13d.trainzmesh"
     position                            0,0,0
     auto-create                         0
   }
   
   znacka22
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "iz13e.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka23
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "iz26a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka24
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "iz26b.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka25
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "iz31a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka26
   {
     mesh-asset                          <kuid:276690:400067>
     mesh                                "iz31b.trainzmesh"

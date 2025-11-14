@@ -16,25 +16,24 @@ static final class RSUtils
 	define public int TAG_SignAdditionalData = 103;
 	define public int TAG_SignBase			 = 104;
 
-	define public int INPUT_None 	= 1 << 0;
-	define public int INPUT_Int		= 1 << 1;
-	define public int INPUT_Float 	= 1 << 2;
-	define public int INPUT_Sign	= 1 << 3;
-	define public int INPUT_Pole230cm = 1 << 4;
-	define public int INPUT_LowerClip = 1 << 5;
+	define public int INPUT_None 		= 1 << 0;
+	define public int INPUT_Int			= 1 << 1;
+	define public int INPUT_Float 		= 1 << 2;
+	define public int INPUT_Sign		= 1 << 3;
+	define public int INPUT_Pole230cm 	= 1 << 4;
+	define public int INPUT_LowerClip 	= 1 << 5;
 
 	define public int INPUT_AdditionalInputFlags = INPUT_None | INPUT_Int | INPUT_Float | INPUT_Sign;
 
-	define public int Pole_None 	= 1 << 0;
-	define public int Pole_100cm 	= 1 << 1;
-	define public int Pole_200cm 	= 1 << 2;
-	define public int Pole_300cm 	= 1 << 3;
-	define public int Pole_230cm 	= 1 << 4;
+	define public int CUST_Pole_None  = 1 << 0;
+	define public int CUST_Pole_100cm = 1 << 1;
+	define public int CUST_Pole_200cm = 1 << 2;
+	define public int CUST_Pole_300cm = 1 << 3;
+	define public int CUST_Pole_230cm = 1 << 4;
+	define public int CUST_Base 	  = 1 << 15;
 
-	define public int BaseEnable_Bit 	= 1 << 15;
-
-	define public int Default_PoleValuesAll = Pole_None | Pole_100cm | Pole_200cm | Pole_300cm | Pole_230cm;
-	define public int Default_Customization = Pole_300cm | BaseEnable_Bit;
+	define public int CUST_PoleValuesAll = CUST_Pole_None | CUST_Pole_100cm | CUST_Pole_200cm | CUST_Pole_300cm | CUST_Pole_230cm;
+	define public int CUST_DefaultValues = CUST_Pole_300cm | CUST_Base;
 
 	define public string CFG_Base = "zaklad";
 	define public string CFG_Pole = "sloup";
@@ -42,11 +41,11 @@ static final class RSUtils
 	define public string CFG_Sign = "znacka";
 
 	// HTML strings (You can localize without using the stringtable provided by Trainz)
-	define public string TEXT_Pole_None		= "Žádný";
-	define public string TEXT_Pole_100cm 	= "1 metr";
-	define public string TEXT_Pole_200cm 	= "2 metry";
-	define public string TEXT_Pole_300cm 	= "3 metry";
-	define public string TEXT_Pole_230cm 	= "2.3 metru";
+	define public string TEXT_CUST_Pole_None		= "Žádný";
+	define public string TEXT_CUST_Pole_100cm 	= "1 metr";
+	define public string TEXT_CUST_Pole_200cm 	= "2 metry";
+	define public string TEXT_CUST_Pole_300cm 	= "3 metry";
+	define public string TEXT_CUST_Pole_230cm 	= "2.3 metru";
 	define public string TEXT_BaseHTML 		= "Základ";
 	define public string TEXT_PoleHTML 		= "Sloup";
 	define public string TEXT_ExtraDataHTML = "Data navíc";
@@ -57,14 +56,21 @@ static final class RSUtils
 
 
 	// ============================================
-	// Functions
+	// Function definitions
 	// ============================================
-	public float floor(float InValue)
+
+	/// @brief Rounds given float value down to the largest possible integer
+	/// @param Value Number to convert
+	/// @return Converted integer value casted to float
+	public float floor(float Value)
 	{
-		int Tmp = (int) InValue;
+		int Tmp = (int) Value;
 		return (float) Tmp;
 	}
 
+	/// @brief Formats given float into a string for HTML in a way it does not contain the dot if not neccessary
+	/// @param Value Number to format into a string
+	/// @return Formatted string containing the given number
 	public string FormatFloatInput(float Value)
 	{
 		string FormattedString = (string) Value;
@@ -83,6 +89,9 @@ static final class RSUtils
 		return FormattedString;
 	}
 
+	/// @brief Formats given integer into a string for HTML, clamps it's range to [0,150]
+	/// @param Value Number to format into a string
+	/// @return Formatted string containing the given number
 	public string FormatIntInput(int Value)
 	{
 		// Clamp into allowed range
@@ -92,44 +101,53 @@ static final class RSUtils
 		return (string) Value;
 	}
 
+	/// @brief Determines if the sign pole mesh is shown or not
+	/// @param Customization Current sign configuration, used to extract the sign pole type
+	/// @return True if the sign mesh is visible, False otherwise
 	public bool IsSignPoleVisible(int Customization)
 	{
-		int PoleBitsExceptNone = RSUtils.Default_PoleValuesAll & ~RSUtils.Pole_None;
+		int PoleBitsExceptNone = RSUtils.CUST_PoleValuesAll & ~RSUtils.CUST_Pole_None;
 		bool bIsPoleSelected = Customization & PoleBitsExceptNone;
 		return bIsPoleSelected;
 	}
 
+	/// @brief Converts HTML string text of sign pole type to flag representation
+	/// @param PoleHtmlText HTML string to convert
+	/// @return Flag representation of the sign pole
 	public int GetSignPoleFlagFromHtmlText(string PoleHtmlText)
 	{
 		int SignPoleFlag = 0;
-		if 		(PoleHtmlText == TEXT_Pole_None)  SignPoleFlag = Pole_None;
-		else if (PoleHtmlText == TEXT_Pole_100cm) SignPoleFlag = Pole_100cm;
-		else if (PoleHtmlText == TEXT_Pole_200cm) SignPoleFlag = Pole_200cm;
-		else if (PoleHtmlText == TEXT_Pole_300cm) SignPoleFlag = Pole_300cm;
-		else if (PoleHtmlText == TEXT_Pole_230cm) SignPoleFlag = Pole_230cm;
+		if 		(PoleHtmlText == TEXT_CUST_Pole_None)  SignPoleFlag = CUST_Pole_None;
+		else if (PoleHtmlText == TEXT_CUST_Pole_100cm) SignPoleFlag = CUST_Pole_100cm;
+		else if (PoleHtmlText == TEXT_CUST_Pole_200cm) SignPoleFlag = CUST_Pole_200cm;
+		else if (PoleHtmlText == TEXT_CUST_Pole_300cm) SignPoleFlag = CUST_Pole_300cm;
+		else if (PoleHtmlText == TEXT_CUST_Pole_230cm) SignPoleFlag = CUST_Pole_230cm;
 
 		return SignPoleFlag;
 	}
 
+	/// @brief Construct HTML text from the sign pole flag representation
+	/// @param CustomizationFlags Current sign configuration, used to extract the sign pole type
+	/// @return HTML text representing the currently used sign pole
 	public string GetCurrentSignPoleHtmlText(int CustomizationFlags)
 	{
 		string PoleHtmlText = "ERROR";
-		switch(CustomizationFlags & RSUtils.Default_PoleValuesAll)
+		switch(CustomizationFlags & RSUtils.CUST_PoleValuesAll)
 		{
-			case RSUtils.Pole_None:
-				PoleHtmlText = TEXT_Pole_None;
+			case RSUtils.CUST_Pole_None:
+				PoleHtmlText = TEXT_CUST_Pole_None;
 				break;
-			case RSUtils.Pole_100cm:
-				PoleHtmlText = TEXT_Pole_100cm;
+			case RSUtils.CUST_Pole_100cm:
+				PoleHtmlText = TEXT_CUST_Pole_100cm;
 				break;
-			case RSUtils.Pole_200cm:
-				PoleHtmlText = TEXT_Pole_200cm;
+			case RSUtils.CUST_Pole_200cm:
+				PoleHtmlText = TEXT_CUST_Pole_200cm;
 				break;
-			case RSUtils.Pole_300cm:
-				PoleHtmlText = TEXT_Pole_300cm;
+			case RSUtils.CUST_Pole_300cm:
+				PoleHtmlText = TEXT_CUST_Pole_300cm;
 				break;
-			case RSUtils.Pole_230cm:
-				PoleHtmlText = TEXT_Pole_230cm;
+			case RSUtils.CUST_Pole_230cm:
+				PoleHtmlText = TEXT_CUST_Pole_230cm;
 				break;
 			default:
 				break;
@@ -137,20 +155,24 @@ static final class RSUtils
 		return PoleHtmlText;
 	}
 
+	/// @brief Constructs sign pole or sign clip config tag to be used in scripts
+	/// @param CfgTag Specification of the config mesh entry to use
+	/// @param CustomizationFlags Current sign configuration, used to extract the sign pole type
+	/// @return String representation of the config tag
 	public string GetSignPoleOrClipConfigTag(string CfgTag, int CustomizationFlags)
 	{
-		switch(CustomizationFlags & Default_PoleValuesAll)
+		switch(CustomizationFlags & CUST_PoleValuesAll)
 		{
-			case RSUtils.Pole_100cm:
+			case RSUtils.CUST_Pole_100cm:
 				CfgTag = CfgTag +"01";
 				break;
-			case RSUtils.Pole_200cm:
+			case RSUtils.CUST_Pole_200cm:
 				CfgTag = CfgTag +"02";
 				break;
-			case RSUtils.Pole_300cm:
+			case RSUtils.CUST_Pole_300cm:
 				CfgTag = CfgTag +"03";
 				break;
-			case RSUtils.Pole_230cm:
+			case RSUtils.CUST_Pole_230cm:
 				CfgTag = CfgTag +"04";
 				break;
 			default:
@@ -160,6 +182,9 @@ static final class RSUtils
 		return CfgTag;
 	}
 
+	/// @brief Constructs sign config tag to be used in scripts
+	/// @param Index Specification of which sign mesh to reference
+	/// @return String representation of the config tag
 	public string GetSignConfigTag(int Index)
 	{
 		// Tags start from 01, but code starts from 00
@@ -177,23 +202,26 @@ static final class RSUtils
 		return CfgTag + Index;
 	}
 
+	/// @brief Determines relative height offset of the sign mesh
+	/// @param CustomizationFlags Current sign configuration, used to extract the sign pole type
+	/// @return Relative height offset for given sign configuration
 	public float GetSignHeightFromPole(int CustomizationFlags)
 	{
 		float Height = 0.0;
-		switch(CustomizationFlags & RSUtils.Default_PoleValuesAll)
+		switch(CustomizationFlags & RSUtils.CUST_PoleValuesAll)
 		{
-			case RSUtils.Pole_None:
+			case RSUtils.CUST_Pole_None:
 				break;
-			case RSUtils.Pole_100cm:
+			case RSUtils.CUST_Pole_100cm:
 				Height = -2.0;
 				break;
-			case RSUtils.Pole_200cm:
+			case RSUtils.CUST_Pole_200cm:
 				Height = -1.0;
 				break;
-			case RSUtils.Pole_300cm:
+			case RSUtils.CUST_Pole_300cm:
 				Height = 0.0; // Default mesh exported height
 				break;
-			case RSUtils.Pole_230cm:
+			case RSUtils.CUST_Pole_230cm:
 				Height = 0.0; // Default mesh exported height
 				break;
 			default:
@@ -202,26 +230,50 @@ static final class RSUtils
 		return Height;
 	}
 
+	/// @brief Constructs HTML image tag
+	/// @param w Desired image width
+	/// @param h Desired image height
+	/// @param src Relative path to the image
+	/// @return HTML image in a string
 	public string Img(int w, int h, string src)
 	{
 		return "<img width=" + w + " height=" + h + " src=\"" + src + "\"></img>";
 	}
 
+	/// @brief Constructs HTML radio button
+	/// @param Property PropertyID of the HTML element
+	/// @param Value if the radio button is ticked or not
+	/// @return HTML radio button in a string
 	public string RadioButton(string Property, bool Value)
 	{
 		return HTMLWindow.RadioButton("live://property/" + Property, Value);
 	}
 
+	/// @brief Constructs HTML checkbox
+	/// @param Property PropertyID of the HTML element
+	/// @param Value if the checkbox is ticked or not
+	/// @return HTML checkbox in a string
 	public string Checkbox(int Property, bool Value)
 	{
 		return HTMLWindow.CheckBox("live://property/" + (string)Property, Value);
 	}
 
+	/// @brief Constructs HTML link on a HTML text
+	/// @param Property PropertyID of the HTML element
+	/// @param Tooltip Text to show on link hover
+	/// @param Text Text to wrap as a HTML link
+	/// @return HTML link in a string
 	public string InputField(string Property, string Tooltip, string Text)
 	{
 		return "<td align=left valign=center><font size=2 face=Consolas color=#ffffff><a tooltip=\""+Tooltip+"\" href=live://property/"+Property+">"+Text+"</a></font></td>";
 	}
 
+	/// @brief Constructs HTML table cell
+	/// @param Text Text to show in the cell
+	/// @param ImagePath Relative path to a HTML image to use in the cell
+	/// @param SignSelectionIdx Number correpsonding to the currently selected sign
+	/// @param Idx Identifier of the current HTML cell
+	/// @return HTML table cell in a string
 	public string Td(string Text, string ImagePath, int SignSelectionIdx, int Idx)
 	{
 		string FontColor = "#ffffff";
@@ -239,6 +291,7 @@ static final class RSUtils
 	}
 };
 
+/// {brief Road sign library, currently unused}
 class dzlib isclass Library
 {
 
