@@ -3,7 +3,8 @@
 /// @author Vojtech Cimbura
 /// ============================================
 
-include "MapObject.gs"
+include "mapobject.gs"
+include "orientation.gs"
 include "dz_lib.gs"
 
 
@@ -74,6 +75,9 @@ class DZBase isclass MapObject
 	/// @brief Additional data, such as speed or other values
 	string AdditionalSignData = null;
 
+	/// @brief Signs that should share the same position as this object
+	GameObjectID[] AssociatedSignIDs;
+
 	// ============================================
 	// Function declarations
 	// ============================================
@@ -99,6 +103,9 @@ class DZBase isclass MapObject
 	/// @brief Hides or shows the sign base mesh
 	/// @param bState Whether to show or hide the sign base mesh
 	void UpdateSignBaseMesh(bool bState);
+
+	/// @brief Processes all associated signs and sets their position and rotation to match this object
+	void UpdateAssociatedSigns();
 
 	/// @brief Restores object state with a Soup object returned from a previous call to GetProperties()
 	/// @detail Called by Trainz whenever this objec should *LOAD* it's configuration
@@ -167,6 +174,7 @@ class DZBase isclass MapObject
 		inherited();
 
 		SignEntries = new SignData[0];
+		AssociatedSignIDs = new GameObjectID[0];
 	}
 
 	public int EmplaceEntry()
@@ -251,6 +259,21 @@ class DZBase isclass MapObject
 		SetMeshVisible(RSUtils.CFG_Base, bState, 0.0f);
 	}
 
+	void UpdateAssociatedSigns()
+	{
+		int i = 0;
+		for (i = 0; i < AssociatedSignIDs.size(); ++i)
+		{
+			DZBase SignObject = cast<DZBase>(Router.GetGameObject(AssociatedSignIDs[i]));
+
+			if (SignObject)
+			{
+				SignObject.SetMapObjectOrientation(GetMapObjectOrientation());
+				SignObject.SetMapObjectPosition(GetMapObjectPosition());
+			}
+		}
+	}
+
 	public void SetProperties(Soup Properties)
 	{
 		inherited(Properties);
@@ -258,6 +281,18 @@ class DZBase isclass MapObject
 		SignSelection 		= Properties.GetNamedTagAsInt(RSUtils.TAG_SignSelection, 0);
 		Customization		= Properties.GetNamedTagAsInt(RSUtils.TAG_SignPole, RSUtils.CUST_DefaultValues); // SignPole is a free saving tag
 		AdditionalSignData 	= Properties.GetNamedTag(RSUtils.TAG_SignAdditionalData);
+		int AssociatedSignIDsSize 	= Properties.GetNamedTagAsInt(RSUtils.TAG_NumAssociatedSignIDs, 0);
+		
+		int i;
+		for (i = 0; i < AssociatedSignIDsSize; ++i)
+		{
+			GameObjectID SignID = Properties.GetNamedTagAsGameObjectID(RSUtils.TAG_AssociatedSignID + "/"+ i);
+
+			if (RSUtils.IsValid(SignID))
+			{
+				AssociatedSignIDs[i] = SignID;
+			}
+		}
 
 		ApplyMeshes();
 	}
@@ -269,6 +304,20 @@ class DZBase isclass MapObject
 		Properties.SetNamedTag(RSUtils.TAG_SignSelection, SignSelection);
 		Properties.SetNamedTag(RSUtils.TAG_SignPole, Customization);  // SignPole is a free saving tag
 		Properties.SetNamedTag(RSUtils.TAG_SignAdditionalData, AdditionalSignData);
+		Properties.SetNamedTag(RSUtils.TAG_NumAssociatedSignIDs, AssociatedSignIDs.size());
+
+		int i;
+		for (i = 0; i < AssociatedSignIDs.size(); ++i)
+		{
+			if (!RSUtils.IsValid(AssociatedSignIDs[i]))
+			{
+				AssociatedSignIDs[i, i+1] = null;
+				continue;
+			}
+			Properties.SetNamedTag(RSUtils.TAG_AssociatedSignID + "/" + i, AssociatedSignIDs[i]);		
+		}
+
+		UpdateAssociatedSigns();
 
 		return Properties;
 	}
@@ -341,31 +390,60 @@ class DZBase isclass MapObject
 				"</tr>";
 		}
 
-		// Print sign matrix
-		int i;
-		for (i = 0; i < SignEntries.size(); ++i)
+		// Associated signs
 		{
-			// Even index = start row, odd index = end row
-			bool bAddStartRow = (i % 2) == 0;
-			if (bAddStartRow)
+			string SearchImg = "<img src=img/search.png></img>";
+			string CrossImg = "<img src=img/cross.png></img>";
+
+			html = html + "</table><table width=100% bgcolor=#333333>"+
+				"<tr>"+
+					"<td colspan=2 align=left><font size=2 face=Consolas color=#ffffff><b> Přidružené značky</b></font></td>"+
+					"<td align=center>" + RSUtils.InputField(RSUtils.TAG_AssociatedSignID, "Přidej značku", SearchImg+"Přidat") + "</td>"+
+				"</tr>";
+
+			int i;
+			for (i = 0; i < AssociatedSignIDs.size(); ++i)
 			{
-				html = html + "<tr height=50>";
+				string Name = RSUtils.GetObjectName(AssociatedSignIDs[i]);
+				html = html +
+					"<tr>"+
+						"<td colspan=2 align=left><font size=2 face=Consolas color=#00ffff>  " + Name + "</font></td>"+
+						"<td align=left>" + RSUtils.InputField(RSUtils.TAG_DelAssociatedSignID + "/" + i, "Vymaže značku " + Name, CrossImg) + "</td>"+
+					"</tr>";
 			}
-			html = html + RSUtils.Td(SignEntries[i].Name, SignEntries[i].ImagePath, SignSelection, i);
-			if (!bAddStartRow)
+			html = html + "</table>";
+		}
+
+		// Print sign matrix
+		{
+			html = html + "<table width=100% bgcolor=#333333>";
+
+			int i;
+			for (i = 0; i < SignEntries.size(); ++i)
+			{
+				// Even index = start row, odd index = end row
+				bool bAddStartRow = (i % 2) == 0;
+				if (bAddStartRow)
+				{
+					html = html + "<tr height=50>";
+				}
+				html = html + RSUtils.Td(SignEntries[i].Name, SignEntries[i].ImagePath, SignSelection, i);
+				if (!bAddStartRow)
+				{
+					html = html + "</tr>";
+				}
+			}
+
+			// Odd number of elements = end last row
+			bool bAddLastEmpty = (SignEntries.size() % 2) == 1;
+			if (bAddLastEmpty)
 			{
 				html = html + "</tr>";
 			}
+			html = html + "</table>";
 		}
 
-		// Odd number of elements = end last row
-		bool bAddLastEmpty = (SignEntries.size() % 2) == 1;
-		if (bAddLastEmpty)
-		{
-			html = html + "</tr>";
-		}
-
-		return html + "</table></body></html>";
+		return html + "</body></html>";
 	}
 
 	public void LinkPropertyValue(string PropertyID)
@@ -426,6 +504,12 @@ class DZBase isclass MapObject
 				}
 				break;
 			}
+			case RSUtils.TAG_DelAssociatedSignID:
+			{
+				int IdxToRemove = Str.ToInt(TagParser[1]);
+				AssociatedSignIDs[IdxToRemove, IdxToRemove+1] = null;
+				break;
+			}
 			default:
 				break;
 		}
@@ -439,6 +523,7 @@ class DZBase isclass MapObject
 		switch(nID)
 		{
 			case RSUtils.TAG_InputEntry:
+			case RSUtils.TAG_AssociatedSignID:
 				return RSUtils.TEXT_EnterHTML;
 			case RSUtils.TAG_SignPole:
 				return RSUtils.TEXT_ChooseHTML;
@@ -493,6 +578,8 @@ class DZBase isclass MapObject
 			}
 			case RSUtils.TAG_SignPole:
 				return "list";
+			case RSUtils.TAG_AssociatedSignID:
+				return "string";
 			default:
 				break;
 		}
@@ -551,7 +638,35 @@ class DZBase isclass MapObject
 				}
 				break;
 			}
+			case RSUtils.TAG_AssociatedSignID:
+			{
+				GameObjectID SignID = Router.SerialiseGameObjectIDFromString(value);
+				if (SignID)
+				{
+					int i = 0;
+					for (i = 0; i < AssociatedSignIDs.size(); ++i)
+					{
+						if (SignID.DoesMatch(AssociatedSignIDs[i]))
+						{
+							// Avoid duplicates
+							return;
+						}
+					}
 
+					AssociatedSignIDs[AssociatedSignIDs.size()] = SignID;
+					
+					DZBase SignObject = cast<DZBase>(Router.GetGameObject(SignID));
+
+					if (SignObject)
+					{
+						SignObject.UpdateSignPoleMesh(RSUtils.CUST_Pole_None); // Note: This causes to log 'null string at parameter 1 (file meshobject.gs)', IDK why
+						SignObject.UpdateSignBaseMesh(false); // Note: This causes to log 'null string at parameter 1 (file meshobject.gs)', IDK why
+						SignObject.SetMapObjectOrientation(GetMapObjectOrientation());
+						SignObject.SetMapObjectPosition(GetMapObjectPosition());
+					}
+				}
+				break;
+			}
 			default:
 				inherited(PropertyID, value);
 				break;

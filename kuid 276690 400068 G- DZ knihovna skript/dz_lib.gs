@@ -11,11 +11,14 @@ include "Library.gs"
 static final class RSUtils
 {
 	// HTML property tags, also can be used for Trainz database save & load operations on the object
-	define public int TAG_SignSelection 	 = 100;
-	define public int TAG_SignPole 		 	 = 101; // Used by 'Customization' variable
-	define public int TAG_InputEntry 		 = 102;
-	define public int TAG_SignAdditionalData = 103;
-	define public int TAG_SignBase			 = 104;
+	define public int TAG_SignSelection 	 	= 100;
+	define public int TAG_SignPole 		 	 	= 101; // Used by 'Customization' variable
+	define public int TAG_InputEntry 		 	= 102;
+	define public int TAG_SignAdditionalData 	= 103;
+	define public int TAG_SignBase			 	= 104;
+	define public int TAG_AssociatedSignID 		= 105;
+	define public int TAG_DelAssociatedSignID 	= 106;
+	define public int TAG_NumAssociatedSignIDs 	= 107;
 
 	define public int INPUT_None 		= 1 << 0; // SignData::SignFlags - AdditionalData not specified
 	define public int INPUT_Int			= 1 << 1; // SignData::SignFlags - AdditionalData storing an integer
@@ -61,6 +64,28 @@ static final class RSUtils
 	// ============================================
 	// Function definitions
 	// ============================================
+
+	/// @brief Checks existence of given GameObjectID
+	/// @param ObjectID ID to test
+	/// @return True if the GameObjectID is valid and the object does exist within the world, False otherwise
+	public bool IsValid(GameObjectID ObjectID)
+	{
+		return ObjectID != null and Router.GetGameObject(ObjectID);
+	}
+
+	/// @brief Creates human readable name from the given object ID
+	/// @param ObjectID GameObjectID to process
+	/// @return Name of the game object
+	public string GetObjectName(GameObjectID ObjectID)
+	{
+		if (ObjectID)
+		{
+			string GameObjectString = ObjectID.SerialiseToString();
+			string[] Parser = Str.Tokens(GameObjectString, ",");
+			return Parser[Parser.size() - 1]; // object name is the last one
+		}
+		return "Nezadáno";
+	}
 
 	/// @brief Rounds given float value down to the largest possible integer
 	/// @param Value Number to convert
