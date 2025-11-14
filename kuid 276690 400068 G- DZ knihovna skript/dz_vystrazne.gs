@@ -1,6 +1,6 @@
 /// ============================================
 /// @file   dz_vystrazne.gs
-/// @author Vojtech Cimbura, 2025
+/// @author Vojtech Cimbura
 /// ============================================
 
 include "dz_base.gs"
@@ -8,6 +8,7 @@ include "dz_base.gs"
 /// @brief Czech road signs, category "Výstražné dopravní značky"
 class DZVystrazne isclass DZBase
 {
+	/// @brief Called when this object enters the scene ('Constructor')
 	void Init()
 	{
 		inherited();

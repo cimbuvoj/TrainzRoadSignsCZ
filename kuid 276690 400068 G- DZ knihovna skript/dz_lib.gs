@@ -1,6 +1,6 @@
 /// ============================================
 /// @file   dz_lib.gs
-/// @author Vojtech Cimbura, 2025
+/// @author Vojtech Cimbura
 /// ============================================
 
 
@@ -10,21 +10,23 @@ include "Library.gs"
 /// @brief Helper class (Road Sign Utils)
 static final class RSUtils
 {
+	// HTML property tags, also can be used for Trainz database save & load operations on the object
 	define public int TAG_SignSelection 	 = 100;
 	define public int TAG_SignPole 		 	 = 101; // Used by 'Customization' variable
 	define public int TAG_InputEntry 		 = 102;
 	define public int TAG_SignAdditionalData = 103;
 	define public int TAG_SignBase			 = 104;
 
-	define public int INPUT_None 		= 1 << 0;
-	define public int INPUT_Int			= 1 << 1;
-	define public int INPUT_Float 		= 1 << 2;
-	define public int INPUT_Sign		= 1 << 3;
-	define public int INPUT_Pole230cm 	= 1 << 4;
-	define public int INPUT_LowerClip 	= 1 << 5;
+	define public int INPUT_None 		= 1 << 0; // SignData::SignFlags - AdditionalData not specified
+	define public int INPUT_Int			= 1 << 1; // SignData::SignFlags - AdditionalData storing an integer
+	define public int INPUT_Float 		= 1 << 2; // SignData::SignFlags - AdditionalData storing a float
+	define public int INPUT_String		= 1 << 3; // SignData::SignFlags - AdditionalData storing a string
+	define public int INPUT_Pole230cm 	= 1 << 4; // SignData::SignFlags - sign must have 230cm pole only
+	define public int INPUT_LowerClip 	= 1 << 5; // SignData::SignFlags - sign must have the sign clip located lower than usually
 
-	define public int INPUT_AdditionalInputFlags = INPUT_None | INPUT_Int | INPUT_Float | INPUT_Sign;
+	define public int INPUT_AdditionalInputFlags = INPUT_None | INPUT_Int | INPUT_Float | INPUT_String;
 
+	// DZBase::Customization uses those to specify the current sign visuals
 	define public int CUST_Pole_None  = 1 << 0;
 	define public int CUST_Pole_100cm = 1 << 1;
 	define public int CUST_Pole_200cm = 1 << 2;
@@ -35,24 +37,25 @@ static final class RSUtils
 	define public int CUST_PoleValuesAll = CUST_Pole_None | CUST_Pole_100cm | CUST_Pole_200cm | CUST_Pole_300cm | CUST_Pole_230cm;
 	define public int CUST_DefaultValues = CUST_Pole_300cm | CUST_Base;
 
+	// config.txt mesh tags
 	define public string CFG_Base = "zaklad";
 	define public string CFG_Pole = "sloup";
 	define public string CFG_Clip = "svorka";
 	define public string CFG_Sign = "znacka";
 
 	// HTML strings (You can localize without using the stringtable provided by Trainz)
-	define public string TEXT_CUST_Pole_None		= "Žádný";
+	define public string TEXT_CUST_Pole_None	= "Žádný";
 	define public string TEXT_CUST_Pole_100cm 	= "1 metr";
 	define public string TEXT_CUST_Pole_200cm 	= "2 metry";
 	define public string TEXT_CUST_Pole_300cm 	= "3 metry";
 	define public string TEXT_CUST_Pole_230cm 	= "2.3 metru";
-	define public string TEXT_BaseHTML 		= "Základ";
-	define public string TEXT_PoleHTML 		= "Sloup";
-	define public string TEXT_ExtraDataHTML = "Data navíc";
-	define public string TEXT_NoBaseHTML 	= "Nelze vybrat";
-	define public string TEXT_TitleHTML 	= "DOPRAVNÍ ZNAČKY";
-	define public string TEXT_ChooseHTML 	= "Vyber";
-	define public string TEXT_EnterHTML 	= "Zadej";
+	define public string TEXT_BaseHTML 			= "Základ";
+	define public string TEXT_PoleHTML 			= "Sloup";
+	define public string TEXT_ExtraDataHTML 	= "Data navíc";
+	define public string TEXT_NoBaseHTML 		= "Nelze vybrat";
+	define public string TEXT_TitleHTML 		= "DOPRAVNÍ ZNAČKY";
+	define public string TEXT_ChooseHTML 		= "Vyber";
+	define public string TEXT_EnterHTML 		= "Zadej";
 
 
 	// ============================================
@@ -94,7 +97,7 @@ static final class RSUtils
 	/// @return Formatted string containing the given number
 	public string FormatIntInput(int Value)
 	{
-		// Clamp into allowed range
+		// Clamp into allowed range (Czech road speed limit is max 150kph)
 		Value = Math.Max(Value, 0);
 		Value = Math.Min(Value, 150);
 		
@@ -187,7 +190,7 @@ static final class RSUtils
 	/// @return String representation of the config tag
 	public string GetSignConfigTag(int Index)
 	{
-		// Tags start from 01, but code starts from 00
+		// Tags start from 01, but code starts indexing from 0
 		// -> add 1 to get correct CFG tag
 		Index = Index + 1;
 
@@ -271,7 +274,7 @@ static final class RSUtils
 	/// @brief Constructs HTML table cell
 	/// @param Text Text to show in the cell
 	/// @param ImagePath Relative path to a HTML image to use in the cell
-	/// @param SignSelectionIdx Number correpsonding to the currently selected sign
+	/// @param SignSelectionIdx Number corresponding to the currently selected sign
 	/// @param Idx Identifier of the current HTML cell
 	/// @return HTML table cell in a string
 	public string Td(string Text, string ImagePath, int SignSelectionIdx, int Idx)

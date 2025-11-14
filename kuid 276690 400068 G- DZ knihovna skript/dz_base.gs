@@ -1,6 +1,6 @@
 /// ============================================
 /// @file   dz_base.gs
-/// @author Vojtech Cimbura, 2025
+/// @author Vojtech Cimbura
 /// ============================================
 
 include "MapObject.gs"
@@ -17,9 +17,30 @@ class SignData
 	/// @brief Sign property flags, currently used bits 1-6, see INPUT_<Name> in RSUtils
 	public int SignFlags = 0;
 	/// @brief Sign additional data, such as speed or maximum vehicle weight specified on the sign by default
-	public float AdditionalData = 0.0f;
+	/// @detail Can contain string values, but also can store floats and integers
+	public string AdditionalData = null;
+
+	// ============================================
+	// Data setters, various parameters
+	// ============================================
 
 	public void SetData(string InName, string InImagePath, int InSignFlags, float InAdditionalData)
+	{
+		Name = InName;
+		ImagePath = InImagePath;
+		SignFlags = InSignFlags;
+		AdditionalData = (string) InAdditionalData;
+	}
+
+	public void SetData(string InName, string InImagePath, int InSignFlags, int InAdditionalData)
+	{
+		Name = InName;
+		ImagePath = InImagePath;
+		SignFlags = InSignFlags;
+		AdditionalData = (string) InAdditionalData;
+	}
+
+	public void SetData(string InName, string InImagePath, int InSignFlags, string InAdditionalData)
 	{
 		Name = InName;
 		ImagePath = InImagePath;
@@ -29,12 +50,12 @@ class SignData
 
 	public void SetData(string InName, string InImagePath, int InSignFlags)
 	{
-		SetData(InName, InImagePath, InSignFlags, 0.0f);
+		SetData(InName, InImagePath, InSignFlags, null);
 	}
 
 	public void SetData(string InName, string InImagePath)
 	{
-		SetData(InName, InImagePath, RSUtils.INPUT_None, 0.0f);
+		SetData(InName, InImagePath, RSUtils.INPUT_None, null);
 	}
 };
 
@@ -56,6 +77,9 @@ class DZBase isclass MapObject
 	// ============================================
 	// Function declarations
 	// ============================================
+
+	/// @brief Called when this object enters the scene ('Constructor')
+	void Init();
 
 	/// @brief Adds a new element into SignEntries
 	/// @return The index on which the newly added array element resides
@@ -138,7 +162,6 @@ class DZBase isclass MapObject
 	// Function definitions
 	// ============================================
 
-	// -----------------------------------------------------------
 	void Init()
 	{
 		inherited();
@@ -146,7 +169,6 @@ class DZBase isclass MapObject
 		SignEntries = new SignData[0];
 	}
 
-	// -----------------------------------------------------------
 	public int EmplaceEntry()
 	{
 		int Index = SignEntries.size();
@@ -154,7 +176,6 @@ class DZBase isclass MapObject
 		return Index;
 	}
 
-	// -----------------------------------------------------------
 	void ApplyMeshes()
 	{
 		// Apply sign pole and clip
@@ -179,7 +200,6 @@ class DZBase isclass MapObject
 		}
 	}
 
-	// -----------------------------------------------------------
 	void UpdateSignClipMesh(bool bState)
 	{
 		string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
@@ -196,7 +216,6 @@ class DZBase isclass MapObject
 		}
 	}
 
-	// -----------------------------------------------------------
 	void UpdateSignPoleMesh(int NewPoleBit)
 	{
 		// Reset previous mesh if it is a valid mesh name
@@ -221,12 +240,9 @@ class DZBase isclass MapObject
 			// Show pole mesh
 			SetMeshVisible(MeshName, true, 0.0f);
 		}
-
-		// Always update the position of the sign clip mesh
 		UpdateSignClipMesh(true);
 	}
 
-	// -----------------------------------------------------------
 	void UpdateSignBaseMesh(bool bState)
 	{
 		int NewValue = ((int)bState) * RSUtils.CUST_Base;
@@ -235,7 +251,6 @@ class DZBase isclass MapObject
 		SetMeshVisible(RSUtils.CFG_Base, bState, 0.0f);
 	}
 
-	// -----------------------------------------------------------
 	public void SetProperties(Soup Properties)
 	{
 		inherited(Properties);
@@ -247,7 +262,6 @@ class DZBase isclass MapObject
 		ApplyMeshes();
 	}
 
-	// -----------------------------------------------------------
 	public Soup GetProperties()
 	{
 		Soup Properties = inherited();
@@ -259,11 +273,6 @@ class DZBase isclass MapObject
 		return Properties;
 	}
 
-	// ======================
-	// HTML
-	// ======================
-
-	// -----------------------------------------------------------
 	public string CreateHTML(string Title)
 	{
 		// HTML window base
@@ -295,7 +304,8 @@ class DZBase isclass MapObject
 
 			html = html +
 				"<tr height=30>"+
-					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_PoleHTML + " : " + RSUtils.InputField(RSUtils.TAG_SignPole + "/" + PoleValue, RSUtils.TEXT_EnterHTML, PoleHtmlText) +"</font></td>"+
+					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_PoleHTML + " : " +
+					RSUtils.InputField(RSUtils.TAG_SignPole + "/" + PoleValue, RSUtils.TEXT_EnterHTML, PoleHtmlText) +"</font></td>"+
 				"</tr>";
 		}
 
@@ -311,13 +321,13 @@ class DZBase isclass MapObject
 				switch (AdditionalInputSignFlags)
 				{
 					case RSUtils.INPUT_Int:
-						AdditionalSignData = RSUtils.FormatIntInput((int) SignEntries[SignSelection].AdditionalData);
+						AdditionalSignData = RSUtils.FormatIntInput(Str.ToInt(SignEntries[SignSelection].AdditionalData));
 						break;
 					case RSUtils.INPUT_Float:
-						AdditionalSignData = RSUtils.FormatFloatInput(SignEntries[SignSelection].AdditionalData);
+						AdditionalSignData = RSUtils.FormatFloatInput(Str.ToFloat(SignEntries[SignSelection].AdditionalData));
 						break;
-					case RSUtils.INPUT_Sign:
-						AdditionalSignData = ""; // TODO?
+					case RSUtils.INPUT_String:
+						AdditionalSignData = ""; // TODO Might be used in the future
 						break;
 					default:
 						break;
@@ -326,7 +336,8 @@ class DZBase isclass MapObject
 
 			html = html +
 				"<tr height=30>"+
-					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_ExtraDataHTML + " " + RSUtils.InputField(RSUtils.TAG_InputEntry + "/" + SignSelection, RSUtils.TEXT_EnterHTML, AdditionalSignData) +"</font></td>"+
+					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_ExtraDataHTML + " " +
+					RSUtils.InputField(RSUtils.TAG_InputEntry + "/" + SignSelection, RSUtils.TEXT_EnterHTML, AdditionalSignData) +"</font></td>"+
 				"</tr>";
 		}
 
@@ -357,7 +368,6 @@ class DZBase isclass MapObject
 		return html + "</table></body></html>";
 	}
 
-	// -----------------------------------------------------------
 	public void LinkPropertyValue(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -421,7 +431,6 @@ class DZBase isclass MapObject
 		}
 	}
 
-	// -----------------------------------------------------------
 	public string GetPropertyName(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -440,7 +449,6 @@ class DZBase isclass MapObject
 		return inherited(PropertyID);
 	}
 
-	// -----------------------------------------------------------
 	public string GetPropertyValue(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -458,7 +466,6 @@ class DZBase isclass MapObject
 		return inherited(PropertyID);
 	}
 
-	// -----------------------------------------------------------
 	public string GetPropertyType(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -478,7 +485,7 @@ class DZBase isclass MapObject
 					case RSUtils.INPUT_Float:
 						// Usually for width or height of vehicles, 9.9 is enough
 						return "float,0,9.9,0.1";
-					case RSUtils.INPUT_Sign:
+					case RSUtils.INPUT_String:
 						return "string";
 					default:
 						break;
@@ -492,7 +499,6 @@ class DZBase isclass MapObject
 		return "link";
     }
 
-    // -----------------------------------------------------------
 	public string[] GetPropertyElementList(string PropertyID)
 	{
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -518,7 +524,6 @@ class DZBase isclass MapObject
 		return inherited(PropertyID);
 	}
 
-	// -----------------------------------------------------------
 	public void SetPropertyValue(string PropertyID, string value)
 	{
 		if (value == null or value == "") return;
@@ -553,7 +558,6 @@ class DZBase isclass MapObject
 		}
 	}
 
-	// -----------------------------------------------------------
 	public void SetPropertyValue(string PropertyID, int value)
 	{		
 		string[] TagParser = Str.Tokens(PropertyID, "/");
@@ -570,7 +574,6 @@ class DZBase isclass MapObject
 		}
 	}
 
-	// -----------------------------------------------------------
 	public void SetPropertyValue(string PropertyID, float value)
 	{		
 		string[] TagParser = Str.Tokens(PropertyID, "/");
