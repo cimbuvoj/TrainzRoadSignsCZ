@@ -4,7 +4,6 @@
 /// ============================================
 
 include "mapobject.gs"
-include "orientation.gs"
 include "dz_lib.gs"
 
 
@@ -211,17 +210,19 @@ class DZBase isclass MapObject
 	void UpdateSignClipMesh(bool bState)
 	{
 		string MeshName = RSUtils.GetSignPoleOrClipConfigTag(RSUtils.CFG_Clip, Customization);
-		SetMeshVisible(MeshName, bState, 0.0f);
-		
-		if (bState)
+		if (MeshName != null)
 		{
-			float ClipOffsetZ = 0.0f;
-			if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
+			SetMeshVisible(MeshName, bState, 0.0f);
+			if (bState)
 			{
-				ClipOffsetZ = -0.15f;
+				float ClipOffsetZ = 0.0f;
+				if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_LowerClip)
+				{
+					ClipOffsetZ = -0.15f;
+				}
+				SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
 			}
-			SetMeshTranslation(MeshName, 0.0f, 0.0f, ClipOffsetZ);
-		}
+		}	
 	}
 
 	void UpdateSignPoleMesh(int NewPoleBit)
