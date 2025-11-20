@@ -656,6 +656,12 @@ class DZBase isclass MapObject
 				GameObjectID SignID = Router.SerialiseGameObjectIDFromString(value);
 				if (SignID)
 				{
+					if (SignID.DoesMatch(me.GetGameObjectID()))
+					{
+						// Do not add self
+						return;
+					}
+
 					int i = 0;
 					for (i = 0; i < AssociatedSignIDs.size(); ++i)
 					{
@@ -666,12 +672,13 @@ class DZBase isclass MapObject
 						}
 					}
 
-					AssociatedSignIDs[AssociatedSignIDs.size()] = SignID;
-					
 					DZBase SignObject = cast<DZBase>(Router.GetGameObject(SignID));
 
+					// Add only if the sign exists in the world
 					if (SignObject)
 					{
+						AssociatedSignIDs[AssociatedSignIDs.size()] = SignID;
+
 						SignObject.UpdateSignPoleMesh(RSUtils.CUST_Pole_None); // Note: This causes to log 'null string at parameter 1 (file meshobject.gs)', unknown reason
 						SignObject.UpdateSignBaseMesh(false); // Note: This causes to log 'null string at parameter 1 (file meshobject.gs)', unknown reason
 						SignObject.SetMapObjectOrientation(GetMapObjectOrientation());

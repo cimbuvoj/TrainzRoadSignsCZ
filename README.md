@@ -1,12 +1,14 @@
 # Trainz Road Signs [CZ]
 Trainz Script code for road signs for Trainz Simulator games.
 
-![Ingame Screenshot][preview]
+<p align="center">
+  <img src="readmeimg/dopravni_znacky_pack.jpg" />
+</p>
 
 ## Description
 
 Script code is a part of a package that consists of scripts and models.
-The whole package is available to freely download [here](http://www.glocky-trainz.funsite.cz/download/scenery/scen95.php).
+The whole package is available to freely download here: [http://www.glocky-trainz.funsite.cz](http://www.glocky-trainz.funsite.cz/download/scenery/scen95.php).
 There are currently 6 place-able sign types (kuids), each can have multiple types, totalling 114 different signs avaiable to display.
 This code is publicly accessible and modifiable. If you have suggestions, feel free to fork and create pull request - your changes / fixes might get into future releases.
 The HTML interface uses Czech language.
@@ -17,7 +19,7 @@ The HTML interface uses Czech language.
 
 * Targeted **Trainz Simulator 2019**
 * Compatible with **Trainz: A New Era**
-* Meshes, the whole package: [here](http://www.glocky-trainz.funsite.cz/download/scenery/scen95.php)
+* Meshes, entire road sign CDP packages: [http://www.glocky-trainz.funsite.cz](http://www.glocky-trainz.funsite.cz/download/scenery/scen95.php)
 
 ### Installing
 
@@ -33,26 +35,25 @@ The HTML interface uses Czech language.
 	* Attaching a sign to another sign in order to avoid tedious matching of sign positions that are attached on one sign pole
 	* Choosing between different sign types in each category (kuid)
 
-![HTML Selection Preview][html-preview]
+<p align="center">
+  <img src="readmeimg/html_preview.jpg" />
+</p>
 
 ## Authors
 
 Vojtěch Cimbura
 
 ## Version History
+See [release history](https://github.com/cimbuvoj/TrainzRoadSignsCZ/releases)
 
 * 0.9
     * Initial implementation
-    * See [commit change]() or See [release history]()
 
 
 ## License
 
-This project is licensed under the [MIT] License - see the LICENSE.md file for details
+This project is licensed under the MIT License - see the [License](LICENSE.md) file for details.
 
 ## Acknowledgments
 
 Images are taken from [Wikipedia](https://cs.wikipedia.org/wiki/Seznam_dopravn%C3%ADch_zna%C4%8Dek_v_%C4%8Cesku) and modified to fit the targeted HTML visualization.
-
-[preview]: readmeimg/dopravni_znacky_pack.jpg
-[html-preview]: readmeimg/html_preview.jpg
