@@ -13,7 +13,7 @@ class                                   "Dummy"
 
 script-include-table
 {
-  dz_lib_scripts                        <kuid:276690:400047>
+  dz_lib_scripts                        <kuid:276690:400068>
 }
 
 mesh-table
@@ -175,6 +175,6 @@ thumbnails
 
 kuid-table
 {
-  databaze-scriptu                      <kuid:276690:400047>
+  databaze-scriptu                      <kuid:276690:400068>
   databaze                              <kuid:276690:400067>
 }

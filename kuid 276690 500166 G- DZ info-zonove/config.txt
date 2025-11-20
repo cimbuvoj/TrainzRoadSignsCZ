@@ -1,0 +1,140 @@
+﻿
+kuid                                    <kuid:276690:500166>
+description                             "G- DZ informativni zonove"
+category-class                          "BR"
+username                                "G- DZ info-zonove"
+author                                  "Glocky, Wilks"
+contact-email                           "Mr.Glocky@seznam.cz"
+kind                                    "scenery"
+trainz-build                            4.5
+rotate-yz-range                         -5,5
+script                                  "dummy.gs"
+class                                   "Dummy"
+
+script-include-table
+{
+  dz_lib_scripts                        <kuid:276690:400068>
+}
+
+mesh-table
+{
+  default
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "DZ_default.trainzmesh"
+    position                            0,0,0
+    auto-create                         1
+  }
+  
+  zaklad
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "zaklad.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  sloup01
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "tyc-1000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  sloup02
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "tyc-2000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  sloup03
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "tyc-3000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  svorka01
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "svorka-1000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  svorka02
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "svorka-2000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  svorka03
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "svorka-3000.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka01
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "iz01a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka02
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "iz01b.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka03
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "iz02a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka04
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "iz02b.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+  
+  znacka05
+  {
+    mesh-asset                          <kuid:276690:400067>
+    mesh                                "iz03a.trainzmesh"
+    position                            0,0,0
+    auto-create                         0
+  }
+}
+
+thumbnails
+{
+  0
+  {
+    width                               240
+    height                              180
+    image                               "image.jpg"
+  }
+}
+
+kuid-table
+{
+  databaze-scriptu                      <kuid:276690:400068>
+  databaze                              <kuid:276690:400067>
+}
