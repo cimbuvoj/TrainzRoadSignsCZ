@@ -1,5 +1,5 @@
 # Trainz Road Signs [CZ]
-Trainz Script code for road signs for Trainz Simulator games.
+Trainz Script code for Czech road signs used in Trainz Simulator games.
 
 <p align="center">
   <img src="readmeimg/dopravni_znacky_pack.jpg" />
@@ -46,7 +46,7 @@ Vojtěch Cimbura
 ## Version History
 See [release history](https://github.com/cimbuvoj/TrainzRoadSignsCZ/releases)
 
-* 0.9
+* v0.9
     * Initial implementation
 
 
