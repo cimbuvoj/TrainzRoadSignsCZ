@@ -12,7 +12,7 @@ static final class RSUtils
 {
 	// HTML property tags, also can be used for Trainz database save & load operations on the object
 	define public int TAG_SignSelection 	 	= 100;
-	define public int TAG_SignPole 		 	 	= 101; // Used by 'Customization' variable
+	define public int TAG_SignPole 		 	 	= 101; // Used by 'DZBase::Customization' variable
 	define public int TAG_InputEntry 		 	= 102;
 	define public int TAG_SignAdditionalData 	= 103;
 	define public int TAG_SignBase			 	= 104;
@@ -46,7 +46,7 @@ static final class RSUtils
 	define public string CFG_Clip = "svorka";
 	define public string CFG_Sign = "znacka";
 
-	// HTML strings (You can localize without using the stringtable provided by Trainz)
+	// Some HTML strings
 	define public string TEXT_CUST_Pole_None	= "Žádný";
 	define public string TEXT_CUST_Pole_100cm 	= "1 metr";
 	define public string TEXT_CUST_Pole_200cm 	= "2 metry";
@@ -307,7 +307,7 @@ static final class RSUtils
 		string FontColor = "#ffffff";
 		
 		// Highlighted signs will get highlighted text
-		if (ImagePath and Str.Find(ImagePath, "z", ImagePath.size() - 5) > 0)
+		if (ImagePath and Str.Find(ImagePath, "z", ImagePath.size() - 5) > 0) // Why 'ImagePath.size() - 5'? last letter in image filename, e.g. 'sign1z.png'
 		{
 			FontColor = "#F4E601";
 		}

@@ -26,14 +26,14 @@ class DZVystrazne isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("A 7a Nerovnost vozovky", 				"img/a7a.png", 	RSUtils.INPUT_LowerClip);
 		SignEntries[EmplaceEntry()].SetData("A 10 Světelné signály", 				"img/a10.png", 	RSUtils.INPUT_LowerClip);
 		SignEntries[EmplaceEntry()].SetData("A 11 Přechod pro chodce", 				"img/a11.png", 	RSUtils.INPUT_LowerClip);
-		SignEntries[EmplaceEntry()].SetData("A 11 Přechod pro chodce", 				"img/a11z.png", RSUtils.INPUT_LowerClip);
+		SignEntries[EmplaceEntry()].SetData("A 11 Přechod pro chodce", 				"img/a11z.png");
 		SignEntries[EmplaceEntry()].SetData("A 12a Chodci", 						"img/a12a.png", RSUtils.INPUT_LowerClip);
-		SignEntries[EmplaceEntry()].SetData("A 12a Chodci", 						"img/a12az.png",RSUtils.INPUT_LowerClip);
+		SignEntries[EmplaceEntry()].SetData("A 12a Chodci", 						"img/a12az.png");
 		SignEntries[EmplaceEntry()].SetData("A 12b Děti", 							"img/a12b.png", RSUtils.INPUT_LowerClip);
-		SignEntries[EmplaceEntry()].SetData("A 12b Děti", 							"img/a12bz.png",RSUtils.INPUT_LowerClip);
+		SignEntries[EmplaceEntry()].SetData("A 12b Děti", 							"img/a12bz.png");
 		SignEntries[EmplaceEntry()].SetData("A 14 Zvěř", 							"img/a14.png", 	RSUtils.INPUT_LowerClip);
 		SignEntries[EmplaceEntry()].SetData("A 15 Práce na silnici", 				"img/a15.png", 	RSUtils.INPUT_LowerClip);
-		SignEntries[EmplaceEntry()].SetData("A 15 Práce na silnici", 				"img/a15z.png", RSUtils.INPUT_LowerClip);
+		SignEntries[EmplaceEntry()].SetData("A 15 Práce na silnici", 				"img/a15z.png");
 		SignEntries[EmplaceEntry()].SetData("A 21 Tunel", 							"img/a21.png", 	RSUtils.INPUT_LowerClip);
 		SignEntries[EmplaceEntry()].SetData("A 22 Jiné nebezpečí", 					"img/a22.png", 	RSUtils.INPUT_LowerClip);
 		SignEntries[EmplaceEntry()].SetData("A 25 Tramvaj", 						"img/a25.png", 	RSUtils.INPUT_LowerClip);
