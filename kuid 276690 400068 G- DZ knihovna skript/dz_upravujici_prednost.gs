@@ -18,7 +18,6 @@ class DZUpravujiciPrednost isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("P 3 Konec hlavní pozemní komunikace", 			"img/p3.png");
 		SignEntries[EmplaceEntry()].SetData("P 4 Dej přednost v jízdě!", 					"img/p4.png");
 		SignEntries[EmplaceEntry()].SetData("P 4 Dej přednost v jízdě!", 					"img/p4z.png");
-		SignEntries[EmplaceEntry()].SetData("P 5 Dej přednost v jízdě tramvaji!", 			"img/p5.png");
 		SignEntries[EmplaceEntry()].SetData("P 6 Stůj, dej přednost v jízdě!", 				"img/p6.png");
 		SignEntries[EmplaceEntry()].SetData("P 6 Stůj, dej přednost v jízdě!", 				"img/p6z.png");
 		SignEntries[EmplaceEntry()].SetData("P 7 Přednost protijedoucích vozidel", 			"img/p7.png");

@@ -16,7 +16,7 @@ class DZInformativniProvozni isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("IP 2 Zpomalovací práh", 											"img/ip2.png");
 		SignEntries[EmplaceEntry()].SetData("IP 3 Podchod nebo nadchod", 										"img/ip3.png");
 		SignEntries[EmplaceEntry()].SetData("IP 4b Jednosměrný provoz", 										"img/ip4b.png");
-		SignEntries[EmplaceEntry()].SetData("IP 5 Doporučená rychlost", 										"img/ip5.png", RSUtils.INPUT_Int, 70);
+		SignEntries[EmplaceEntry()].SetData("IP 5 Doporučená rychlost", 										"img/ip5.png", RSUtils.INPUT_Int, 70, 10, 90);
 		SignEntries[EmplaceEntry()].SetData("IP 6 Přechod pro chodce", 											"img/ip6.png");
 		SignEntries[EmplaceEntry()].SetData("IP 6 Přechod pro chodce", 											"img/ip6z.png");
 		SignEntries[EmplaceEntry()].SetData("IP 7 Přejezd pro cyklisty", 										"img/ip7.png");
@@ -39,6 +39,8 @@ class DZInformativniProvozni isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("IP 26b Konec obytné zóny", 										"img/ip26b.png");
 		SignEntries[EmplaceEntry()].SetData("IP 31a Měření rychlosti", 											"img/ip31a.png");
 		SignEntries[EmplaceEntry()].SetData("IP 31b Konec měření rychlosti", 									"img/ip31b.png");
+		SignEntries[EmplaceEntry()].SetData("IP 27a Pěší zóna", 												"img/ip27a.png");
+		SignEntries[EmplaceEntry()].SetData("IP 27b Konec pěší zóny", 											"img/ip27b.png");
 
 	}
 	

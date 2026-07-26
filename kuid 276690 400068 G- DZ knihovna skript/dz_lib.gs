@@ -26,6 +26,8 @@ static final class RSUtils
 	define public int INPUT_String		= 1 << 3; // SignData::SignFlags - AdditionalData storing a string
 	define public int INPUT_Pole230cm 	= 1 << 4; // SignData::SignFlags - sign must have 230cm pole only
 	define public int INPUT_LowerClip 	= 1 << 5; // SignData::SignFlags - sign must have the sign clip located lower than usually
+	define public int INPUT_NoPole 		= 1 << 6; // SignData::SignFlags - sign does not support pole selection and must be attached
+	define public int INPUT_OptionCycle	= 1 << 7; // SignData::SignFlags - sign supports cycling through presets
 
 	define public int INPUT_AdditionalInputFlags = INPUT_None | INPUT_Int | INPUT_Float | INPUT_String;
 
@@ -119,12 +121,14 @@ static final class RSUtils
 
 	/// @brief Formats given integer into a string for HTML, clamps it's range to [0,150]
 	/// @param Value Number to format into a string
+	/// @param MinValue Lower bound for Value
+	/// @param MaxValue Upper bound for Value
 	/// @return Formatted string containing the given number
-	public string FormatIntInput(int Value)
+	public string FormatIntInput(int Value, int MinValue, int MaxValue)
 	{
-		// Clamp into allowed range (Czech road speed limit is max 150kph)
-		Value = Math.Max(Value, 0);
-		Value = Math.Min(Value, 150);
+		// Clamp into allowed range
+		Value = Math.Max(Value, MinValue);
+		Value = Math.Min(Value, MaxValue);
 		
 		return (string) Value;
 	}

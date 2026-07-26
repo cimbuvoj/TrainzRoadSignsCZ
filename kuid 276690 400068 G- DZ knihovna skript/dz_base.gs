@@ -16,6 +16,10 @@ class SignData
 	public string ImagePath = null;
 	/// @brief Sign property flags, currently used bits 1-6, see INPUT_<Name> in RSUtils
 	public int SignFlags = 0;
+	/// @brief Minimum value of data (int type)
+	public int DataMin = 0;
+	/// @brief Maximum value of data (int type)
+	public int DataMax = 0;
 	/// @brief Sign additional data, such as speed or maximum vehicle weight specified on the sign by default
 	/// @detail Can contain string values, but also can store floats and integers
 	public string AdditionalData = null;
@@ -38,6 +42,13 @@ class SignData
 		ImagePath = InImagePath;
 		SignFlags = InSignFlags;
 		AdditionalData = (string) InAdditionalData;
+	}
+
+	public void SetData(string InName, string InImagePath, int InSignFlags, int InAdditionalData, int InDataMin, int InDataMax)
+	{
+		SetData(InName, InImagePath, InSignFlags, InAdditionalData);
+		DataMin = InDataMin;
+		DataMax = InDataMax;
 	}
 
 	public void SetData(string InName, string InImagePath, int InSignFlags, string InAdditionalData)
@@ -204,6 +215,27 @@ class DZBase isclass MapObject
 			MeshName = RSUtils.GetSignConfigTag(i);
 			SetMeshVisible(MeshName, i == SignSelection, 0.0f);
 			SetMeshTranslation(MeshName, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
+
+			/*int AdditionalInputSignFlags = SignEntries[i].SignFlags & RSUtils.INPUT_AdditionalInputFlags;
+			bool bIsAdditionalInputDefined = AdditionalInputSignFlags & ~RSUtils.INPUT_None;
+			if (bIsAdditionalInputDefined)
+			{
+				// there are additional sign data to process here
+				switch (AdditionalInputSignFlags)
+				{
+					case RSUtils.INPUT_Int:
+						int Value = Str.ToInt(SignEntries[SignSelection].AdditionalData);
+						AdditionalSignData = RSUtils.FormatIntInput(Str.ToInt(SignEntries[SignSelection].AdditionalData), SignEntries[SignSelection].DataMin, SignEntries[SignSelection].DataMax);
+					case RSUtils.INPUT_Float:
+						AdditionalSignData = RSUtils.FormatFloatInput(Str.ToFloat(SignEntries[SignSelection].AdditionalData));
+						break;
+					case RSUtils.INPUT_String:
+						AdditionalSignData = SignEntries[SignSelection].AdditionalData;
+						break;
+					default:
+						break;
+				}
+			}*/
 		}
 	}
 
@@ -303,6 +335,12 @@ class DZBase isclass MapObject
 			}
 		}
 
+		if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_NoPole)
+		{
+			// Hide pole and sign base
+			Customization = RSUtils.CUST_Pole_None;
+		}
+
 		ApplyMeshes();
 	}
 
@@ -340,7 +378,9 @@ class DZBase isclass MapObject
 					"<td bgcolor=#EECFA1 colspan=6 align=center><font size=5 face=Consolas color=#000000><b>" + RSUtils.TEXT_TitleHTML + " - " + Title + "</b></font></td>"+
 				"</tr>";
 
+		bool bSupportsPole = !(SignEntries[SignSelection].SignFlags & RSUtils.INPUT_NoPole);
 		// Sign - Base
+		if (bSupportsPole)
 		{
 			bool bShowBase = Customization & RSUtils.CUST_Base;
 			string BaseHtml = RSUtils.TEXT_NoBaseHTML;
@@ -356,6 +396,7 @@ class DZBase isclass MapObject
 		}
 
 		// Sign - Pole and Clip
+		if (bSupportsPole)
 		{
 			string PoleHtmlText = RSUtils.GetCurrentSignPoleHtmlText(Customization);
 			int PoleValue = Customization & RSUtils.CUST_PoleValuesAll;
@@ -379,23 +420,32 @@ class DZBase isclass MapObject
 				switch (AdditionalInputSignFlags)
 				{
 					case RSUtils.INPUT_Int:
-						AdditionalSignData = RSUtils.FormatIntInput(Str.ToInt(SignEntries[SignSelection].AdditionalData));
+						AdditionalSignData = RSUtils.FormatIntInput(Str.ToInt(SignEntries[SignSelection].AdditionalData), SignEntries[SignSelection].DataMin, SignEntries[SignSelection].DataMax);
 						break;
 					case RSUtils.INPUT_Float:
 						AdditionalSignData = RSUtils.FormatFloatInput(Str.ToFloat(SignEntries[SignSelection].AdditionalData));
 						break;
 					case RSUtils.INPUT_String:
-						AdditionalSignData = ""; // TODO Might be used in the future
+						AdditionalSignData = SignEntries[SignSelection].AdditionalData;
 						break;
 					default:
 						break;
 				}
 			}
 
+			string AdditionalDataHTML = null;
+			if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_OptionCycle)
+			{
+				AdditionalDataHTML = RSUtils.InputField(RSUtils.TAG_InputEntry + "/" + SignSelection, "", "ZMĚŇ");
+			}
+			else
+			{
+				AdditionalDataHTML = RSUtils.InputField(RSUtils.TAG_InputEntry + "/" + SignSelection, "", AdditionalSignData);
+			}
 			html = html +
 				"<tr height=30>"+
 					"<td colspan=6><font size=2 face=Consolas color=#ffffff> " + RSUtils.TEXT_ExtraDataHTML + " " +
-					RSUtils.InputField(RSUtils.TAG_InputEntry + "/" + SignSelection, "NEFUNKCNI - BUDE VE VERZI v1.0", AdditionalSignData) +"</font></td>"+
+					AdditionalDataHTML + "</font></td>"+
 				"</tr>";
 		}
 
@@ -578,8 +628,16 @@ class DZBase isclass MapObject
 				switch (AdditionalInputSignFlags)
 				{
 					case RSUtils.INPUT_Int:
-						// Any integer, speed can be up to 150kph now in CZ
-						return "int,5,150,5";
+						if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_OptionCycle)
+						{
+							// just a "button"
+							return "link";
+						}
+						else
+						{
+							// Any integer, speed can be up to 150kph now in CZ
+							return "int,5,150,5";
+						}
 					case RSUtils.INPUT_Float:
 						// Usually for width or height of vehicles, 9.9 is enough
 						return "float,0,9.9,0.1";
@@ -634,8 +692,26 @@ class DZBase isclass MapObject
 		switch(nID)
 		{
 			case RSUtils.TAG_InputEntry:
-				AdditionalSignData = value;
+			{
+				if (SignEntries[SignSelection].SignFlags & RSUtils.INPUT_OptionCycle)
+				{
+					// Cycling through options, min to max
+					int Index = Str.ToInt(AdditionalSignData);
+					Index = Index + 1;
+					if (Index > SignEntries[SignSelection].DataMax)
+					{
+						Index = SignEntries[SignSelection].DataMin;
+					}
+					AdditionalSignData = (string) Index;
+				}
+				else
+				{
+					AdditionalSignData = value;
+				}
+
 				break;
+			}
+				
 			case RSUtils.TAG_SignPole:
 			{
 				UpdateSignPoleMesh(RSUtils.GetSignPoleFlagFromHtmlText(value));
@@ -701,7 +777,7 @@ class DZBase isclass MapObject
 		switch(nID)
 		{
 			case RSUtils.TAG_InputEntry:
-				AdditionalSignData = RSUtils.FormatIntInput(value);
+				AdditionalSignData = RSUtils.FormatIntInput(value, SignEntries[SignSelection].DataMin, SignEntries[SignSelection].DataMax);
 				break;
 			default:
 				inherited(PropertyID, value);

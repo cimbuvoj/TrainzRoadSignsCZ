@@ -1,8 +1,8 @@
 ﻿
-kuid                                    <kuid:276690:500164>
-description                             "G- DZ zakazove"
+kuid                                    <kuid:276690:500167>
+description                             "G- DZ dodatkove"
 category-class                          "BR"
-username                                "G- DZ zakazove"
+username                                "G- DZ dodatkove"
 author                                  "Glocky, Wilks"
 contact-email                           "Mr.Glocky@seznam.cz"
 kind                                    "scenery"
