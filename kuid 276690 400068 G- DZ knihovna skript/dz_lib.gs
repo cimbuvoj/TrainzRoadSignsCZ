@@ -19,6 +19,7 @@ static final class RSUtils
 	define public int TAG_AssociatedSignID 		= 105;
 	define public int TAG_DelAssociatedSignID 	= 106;
 	define public int TAG_NumAssociatedSignIDs 	= 107;
+	define public int TAG_AlignAssociatedSigns 	= 108;
 
 	define public int INPUT_None 		= 1 << 0; // SignData::SignFlags - AdditionalData not specified
 	define public int INPUT_Int			= 1 << 1; // SignData::SignFlags - AdditionalData storing an integer
@@ -240,7 +241,8 @@ static final class RSUtils
 	public float GetSignHeightFromPole(int CustomizationFlags)
 	{
 		float Height = 0.0;
-		switch(CustomizationFlags & RSUtils.CUST_PoleValuesAll)
+		int PoleHeight = CustomizationFlags & RSUtils.CUST_PoleValuesAll;
+		switch(PoleHeight)
 		{
 			case RSUtils.CUST_Pole_None:
 				break;
@@ -257,6 +259,7 @@ static final class RSUtils
 				Height = 0.0; // Default mesh exported height
 				break;
 			default:
+				Interface.Print("ERROR: " + PoleHeight);
 				break;
 		}
 		return Height;

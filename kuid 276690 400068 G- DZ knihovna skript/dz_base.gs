@@ -14,7 +14,7 @@ class SignData
 	public string Name = null;
 	/// @brief Relative path to the HTML image
 	public string ImagePath = null;
-	/// @brief Sign property flags, currently used bits 1-6, see INPUT_<Name> in RSUtils
+	/// @brief Sign property flags, currently used bits 1-7, see INPUT_<Name> in RSUtils
 	public int SignFlags = 0;
 	/// @brief Minimum value of data (int type)
 	public int DataMin = 0;
@@ -73,10 +73,10 @@ class SignData
 /// @brief Base class for all sign, inherit from it to add other types and add entires in Init()
 class DZBase isclass MapObject
 {
-	/// @brief  Array of entries for HTML, user defines a new entry and everything else is handled internally
+	/// @brief  Array of sign types in a category, user defines a new entry and everything else is handled internally
 	public SignData[] SignEntries;
 
-	/// @brief Index of sign mesh that should be visible
+	/// @brief Index of selected sign mesh that should be visible
 	int SignSelection = 0;
 
 	/// @brief Flag bitfield, currently used bits: 1-5 pole types, 16 sign base, the rest is free to use 
@@ -309,8 +309,11 @@ class DZBase isclass MapObject
 
 			if (SignObject)
 			{
+				WorldCoordinate AttachedPos = SignObject.GetMapObjectPosition();
+				WorldCoordinate MyPos = GetMapObjectPosition();
+				MyPos.z = AttachedPos.z; // attached sign will get this sign's position except height
+				SignObject.SetMapObjectPosition(MyPos);
 				SignObject.SetMapObjectOrientation(GetMapObjectOrientation());
-				SignObject.SetMapObjectPosition(GetMapObjectPosition());
 			}
 		}
 	}
@@ -363,8 +366,6 @@ class DZBase isclass MapObject
 			}
 			Properties.SetNamedTag(RSUtils.TAG_AssociatedSignID + "/" + i, AssociatedSignIDs[i]);		
 		}
-
-		UpdateAssociatedSigns();
 
 		return Properties;
 	}
@@ -458,8 +459,9 @@ class DZBase isclass MapObject
 
 			html = html + "</table><table width=100% bgcolor=#333333>"+
 				"<tr>"+
-					"<td colspan=2 align=left><font size=2 face=Consolas color=#ffffff><b> Přidružené značky</b></font></td>"+
-					"<td align=center>" + RSUtils.InputField(RSUtils.TAG_AssociatedSignID, Tooltip, SearchImg+"Přidat") + "</td>"+
+					"<td align=left><font size=2 face=Consolas color=#ffffff><b> Přidružené značky</b></font></td>"+
+					RSUtils.InputField(RSUtils.TAG_AlignAssociatedSigns, "Zarovná přidružené značky na pozici", "ZAROVNAT")+
+					RSUtils.InputField(RSUtils.TAG_AssociatedSignID, Tooltip, SearchImg + "Přidat")+
 				"</tr>";
 
 			int i;
@@ -525,7 +527,7 @@ class DZBase isclass MapObject
 				SignSelection = Str.ToInt(TagParser[1]);
 				
 				bool bNew230cmPoleOption = SignEntries[SignSelection].SignFlags & RSUtils.INPUT_Pole230cm;
-				AdditionalSignData = "";
+				AdditionalSignData = null;
 
 				// Update sign pole and clip position
 				if (RSUtils.IsSignPoleVisible(Customization))
@@ -571,6 +573,11 @@ class DZBase isclass MapObject
 			{
 				int IdxToRemove = Str.ToInt(TagParser[1]);
 				AssociatedSignIDs[IdxToRemove, IdxToRemove + 1] = null;
+				break;
+			}
+			case RSUtils.TAG_AlignAssociatedSigns:
+			{
+				UpdateAssociatedSigns();
 				break;
 			}
 			default:
@@ -732,6 +739,14 @@ class DZBase isclass MapObject
 				GameObjectID SignID = Router.SerialiseGameObjectIDFromString(value);
 				if (SignID)
 				{
+					DZBase SignObject = cast<DZBase>(Router.GetGameObject(SignID));
+
+					if (!SignObject)
+					{
+						// Add only if the sign exists in the world
+						return;
+					}
+
 					if (SignID.DoesMatch(me.GetGameObjectID()))
 					{
 						// Do not add self
@@ -748,18 +763,12 @@ class DZBase isclass MapObject
 						}
 					}
 
-					DZBase SignObject = cast<DZBase>(Router.GetGameObject(SignID));
+					AssociatedSignIDs[AssociatedSignIDs.size()] = SignID;
 
-					// Add only if the sign exists in the world
-					if (SignObject)
-					{
-						AssociatedSignIDs[AssociatedSignIDs.size()] = SignID;
-
-						SignObject.UpdateSignPoleMesh(RSUtils.CUST_Pole_None); // Note: This causes to log 'null string at parameter 1 (file meshobject.gs)', unknown reason
-						SignObject.UpdateSignBaseMesh(false); // Note: This causes to log 'null string at parameter 1 (file meshobject.gs)', unknown reason
-						SignObject.SetMapObjectOrientation(GetMapObjectOrientation());
-						SignObject.SetMapObjectPosition(GetMapObjectPosition());
-					}
+					SignObject.UpdateSignPoleMesh(RSUtils.CUST_Pole_None);
+					SignObject.UpdateSignBaseMesh(false);
+					
+					UpdateAssociatedSigns();
 				}
 				break;
 			}
