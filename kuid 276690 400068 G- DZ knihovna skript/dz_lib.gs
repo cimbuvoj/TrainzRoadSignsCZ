@@ -6,7 +6,6 @@
 
 include "Library.gs"
 
-
 /// @brief Helper class (Road Sign Utils)
 static final class RSUtils
 {

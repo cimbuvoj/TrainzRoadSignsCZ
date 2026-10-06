@@ -194,6 +194,11 @@ class DZBase isclass MapObject
 		return Index;
 	}
 
+	void ApplyAdditionalMesh()
+	{
+		// child class implements
+	}
+
 	void ApplyMeshes()
 	{
 		// Apply sign pole and clip
@@ -216,26 +221,12 @@ class DZBase isclass MapObject
 			SetMeshVisible(MeshName, i == SignSelection, 0.0f);
 			SetMeshTranslation(MeshName, 0.0f, 0.0f, RSUtils.GetSignHeightFromPole(Customization));
 
-			/*int AdditionalInputSignFlags = SignEntries[i].SignFlags & RSUtils.INPUT_AdditionalInputFlags;
+			int AdditionalInputSignFlags = SignEntries[i].SignFlags & RSUtils.INPUT_AdditionalInputFlags;
 			bool bIsAdditionalInputDefined = AdditionalInputSignFlags & ~RSUtils.INPUT_None;
 			if (bIsAdditionalInputDefined)
 			{
-				// there are additional sign data to process here
-				switch (AdditionalInputSignFlags)
-				{
-					case RSUtils.INPUT_Int:
-						int Value = Str.ToInt(SignEntries[SignSelection].AdditionalData);
-						AdditionalSignData = RSUtils.FormatIntInput(Str.ToInt(SignEntries[SignSelection].AdditionalData), SignEntries[SignSelection].DataMin, SignEntries[SignSelection].DataMax);
-					case RSUtils.INPUT_Float:
-						AdditionalSignData = RSUtils.FormatFloatInput(Str.ToFloat(SignEntries[SignSelection].AdditionalData));
-						break;
-					case RSUtils.INPUT_String:
-						AdditionalSignData = SignEntries[SignSelection].AdditionalData;
-						break;
-					default:
-						break;
-				}
-			}*/
+				ApplyAdditionalMesh();
+			}
 		}
 	}
 

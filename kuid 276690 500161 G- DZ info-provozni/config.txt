@@ -1,8 +1,8 @@
 ﻿
 kuid                                    <kuid:276690:500161>
-description                             "G- DZ info-provozni"
+description                             "G- DZ informativni"
 category-class                          "BR"
-username                                "G- DZ info-provozni"
+username                                "G- DZ informativni"
 author                                  "Glocky, Wilks"
 contact-email                           "Mr.Glocky@seznam.cz"
 kind                                    "scenery"

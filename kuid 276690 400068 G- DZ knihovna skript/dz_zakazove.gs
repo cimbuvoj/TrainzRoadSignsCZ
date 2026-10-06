@@ -38,6 +38,52 @@ class DZZakazove isclass DZBase
 		SignEntries[EmplaceEntry()].SetData("B 30 Zákaz vstupu chodců", 															"img/b30.png");
 		SignEntries[EmplaceEntry()].SetData("B 32 Jiný zákaz - Průjezd zakázán",													"img/b32b.png");
 	}
+
+	/// @brief Hardcoded assignment of additional mesh names to individual signs
+	void ApplyAdditionalMesh()
+	{		
+		string[] meshesToApply = new string[0];
+		string signType;
+
+		int signIndexInConfig = SignSelection + 1;
+
+		// Hardcoded values - some signs share the same mesh
+		switch(signIndexInConfig)
+		{
+			case 7:
+				signType = RSUtils.GetSignConfigTag(SignSelection);
+				float value = Str.ToFloat(SignEntries[SignSelection].AdditionalData);
+				meshesToApply[meshesToApply.size()] = signType + "_text_220mm_" + (int) value;
+				if (value < 1.0f)
+				{
+					// only option is 0.5
+					meshesToApply[meshesToApply.size()] = signType + "_text_220mm_o5";
+				}
+				break;
+			case 8:
+			case 9:
+				signType = RSUtils.GetSignConfigTag(SignSelection);
+				meshesToApply[meshesToApply.size()] = signType + "_text_160mm_" + SignEntries[SignSelection].AdditionalData[0];
+				meshesToApply[meshesToApply.size()] = signType + "_text_110mm_" + SignEntries[SignSelection].AdditionalData[2];
+				break;
+			case 10:
+			case 11:
+				meshesToApply[meshesToApply.size()] = RSUtils.GetSignConfigTag(SignSelection) + "_text_300mm_" + SignEntries[SignSelection].AdditionalData;
+				break;
+			case 12:
+				meshesToApply[meshesToApply.size()] = RSUtils.GetSignConfigTag(SignSelection) + "_text_300mm_" + SignEntries[SignSelection].AdditionalData;
+				break;
+			default:
+				break;
+		}
+
+		int i;
+		for (i = 0; i < meshesToApply.size(); ++i)
+		{
+			Interface.Print("Applying mesh " + meshesToApply[i]);
+			SetMeshVisible(meshesToApply[i], 0.0f, true);
+		}
+	}
 	
 	/// @brief Construct HTML for the Trainz Property window of this object
 	/// @detail Called by Trainz when the HTML property windows should be summoned
